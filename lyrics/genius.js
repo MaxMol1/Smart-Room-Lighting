@@ -3,12 +3,15 @@ const cheerio = require('cheerio')
 const Genius = require('genius-api');
 
 async function Main() {
+    /* Function to normalize names */
+    const normalizeName = name => name.replace(/[^\w]/g, '').toLowerCase()
+
     /* Function to get artist id */
     Genius.prototype.getArtistID = async function getArtistID(artistName) {
         const response = await this.search(artistName)
         for (let i = 0; i < response.hits.length; i += 1) {
             const hit = response.hits[i]
-            if (hit.type === 'song' && normalizeName(hit.result.primary_artist.name) === artistName)
+            if (hit.type === 'song' && normalizeName(hit.result.primary_artist.name) === normalizeName(artistName))
                 return hit.result.primary_artist.id
         }
         throw new Error("Did not find an artist called: " + artistName)
@@ -36,9 +39,8 @@ async function Main() {
     const genius = new Genius(accessToken)
     
     // artist and song for which to find lyrics
-    const normalizeName = name => name.replace(/[^\w]/g, '').toLowerCase()
-    const song_name = normalizeName(process.argv[2])
-    const artist_name = normalizeName(process.argv[3])
+    const song_name = process.argv[2]
+    const artist_name = process.argv[3]
 
     /* 1. Get artist ID using artist name */
     const artistID = await genius.getArtistID(artist_name)
@@ -53,11 +55,14 @@ async function Main() {
     let songUrl
     songs.songs.some(song => {
         const title = song.title
-        if (normalizeName(title) === song_name) {
+        if (normalizeName(title) === normalizeName(song_name)) {
             songUrl = song.url
             return
         }
     })
+
+    if (songUrl == undefined)
+        throw new Error("Song not found for artist" + artist_name);
 
     /* 4. Fetch and parse html from song url */
     const songHTML = await genius.getSongHTML(songUrl)

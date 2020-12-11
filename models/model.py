@@ -14,6 +14,8 @@ import string
 import os
 import subprocess
 
+from termcolor import colored
+
 def process_artists(artists):
     sid = SentimentIntensityAnalyzer()
     tokenizer = RegexpTokenizer(r'\w+')
@@ -58,13 +60,21 @@ def process_artists(artists):
         percent_positive = (positive/float(negative + positive + neutral))*100
         percent_negative = (negative/float(negative + positive + neutral))*100
 
+        red = "\033[31m"
+        green = "\033[32m"
+        blue = "\033[34m"
         if percent_positive > percent_negative:
-            print(song, 'by', artist, 'is a positive song', percent_positive, 'vs', percent_negative)
+            print(colored(song, 'blue'), 'by', colored(artist, 'blue'), 'is a ', colored('positive', 'green'), 'song')
+            print(percent_positive, 'vs', percent_negative)
         else:
-            print(song, 'by', artist, 'is a negative song', percent_negative, 'vs', percent_positive)
+            print(colored(song, 'blue'), 'by', colored(artist, 'blue'), 'is a ', colored('negative', 'red'), 'song')
+            print(percent_negative, 'vs', percent_positive)
 
 def main():
     artists = {
+        'happy' : 'pharrellwilliams',
+        'scartissue' : 'Red Hot Chili Peppers',
+        'blu' : 'Jon Bellion',
         'loveride' : 'christianfrench',
         'revenge' : 'xxxtentacion',
         'fromtime' : 'drake',
@@ -74,7 +84,7 @@ def main():
         'allgirlsarethesame' : 'juicewrld',
         'jealous' : 'giannikyle',
         'yellow' : 'coldplay',
-        'ffyl' : 'quinnxcii',
+        'come & go' : 'juice wrld',
     }
 
     process_artists(artists=artists)
