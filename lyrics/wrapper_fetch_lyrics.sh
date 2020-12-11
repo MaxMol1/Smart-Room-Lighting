@@ -1,6 +1,6 @@
 #!/bin/bash
 
 # args (no spaces)
-# * 1st - artist
-# * 2nd - song name
-node lyrics.js $1 $2
+# * 1st - song name
+# * 2nd - artist
+node genius.js $1 $2
