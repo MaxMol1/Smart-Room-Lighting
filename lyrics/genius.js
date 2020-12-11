@@ -51,10 +51,12 @@ async function Main() {
 
     /* 3. Get correct song url from list of 50 songs  */
     let songUrl
-    songs.songs.forEach(song => {
+    songs.songs.some(song => {
         const title = song.title
-        if (normalizeName(title) === song_name)
+        if (normalizeName(title) === song_name) {
             songUrl = song.url
+            return
+        }
     })
 
     /* 4. Fetch and parse html from song url */
