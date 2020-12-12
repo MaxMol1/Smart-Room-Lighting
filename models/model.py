@@ -11,83 +11,74 @@ from nltk.corpus import stopwords
 # nltk.download('vader_lexicon')
 import string
 
-import os
-import subprocess
-
 from termcolor import colored
 
-def process_artists(artists):
+import os
+import subprocess
+import sys
+
+def process_artists(song, artist):
     sid = SentimentIntensityAnalyzer()
     tokenizer = RegexpTokenizer(r'\w+')
     # TODO: consider stopword removal
-    # stop_words = stopwocrds.words('english') + list(string.punctuation) + ["ve", "nt", "s", "d", "ll", "re", "m", "verse", "chorus", "outro"]
+    stop_words = stopwords.words('english') + list(string.punctuation) + ["ve", "nt", "s", "d", "ll", "re", "m", "verse", "chorus", "outro"]
 
-    for song,artist in artists.items():
-        positive = 0
-        negative = 0
-        neutral = 0
+    positive = 0
+    negative = 0
+    neutral = 0
 
-        # get lyrics for a song from an artist
-        os.chdir('../lyrics')
-        output = subprocess.check_output(["node", "genius.js", song, artist])
-        os.chdir('../models')
+    # get lyrics for a song from an artist
+    os.chdir('../lyrics')
+    output = subprocess.check_output(["node", "genius.js", song, artist])
+    os.chdir('../models')
 
-        # TODO: no output - stop loop
+    # TODO: no output - stop loop
 
-        # split node app output into a list
-        lyrics = output.split(b'\n')[1:-1]
-        lyrics_tokenized = []
-        
-        # tokenize and remove stopwords
-        for line in lyrics:
-            parsed_line = line.decode('utf-8')
-            parsed_line = tokenizer.tokenize(parsed_line.lower())
-            # parsed_line = [w for w in parsed_line if not w in stop_words and not w.isnumeric()]
-            parsed_line = " ".join(parsed_line)
-            lyrics_tokenized.append(parsed_line)
+    # split node app output into a list
+    lyrics = output.split(b'\n')[1:-1]
+    lyrics_tokenized = []
+    
+    # tokenize and remove stopwords
+    for line in lyrics:
+        parsed_line = line.decode('utf-8')
+        parsed_line = tokenizer.tokenize(parsed_line.lower())
+        parsed_line = [w for w in parsed_line if not w in stop_words and not w.isnumeric()]
+        parsed_line = " ".join(parsed_line)
+        lyrics_tokenized.append(parsed_line)
 
-        # iterate through each line in lyrics
-        for line in lyrics_tokenized:
-            comp = sid.polarity_scores(line)
-            comp = comp['compound']
-            if comp >= 0.5:
-                positive += 1
-            elif comp > -0.5 and comp < 0.5:
-                neutral += 1
-            else:
-                negative += 1
-
-        percent_positive = (positive/float(negative + positive + neutral))*100
-        percent_negative = (negative/float(negative + positive + neutral))*100
-
-        red = "\033[31m"
-        green = "\033[32m"
-        blue = "\033[34m"
-        if percent_positive > percent_negative:
-            print(colored(song, 'blue'), 'by', colored(artist, 'blue'), 'is a ', colored('positive', 'green'), 'song')
-            print(percent_positive, 'vs', percent_negative)
+    # iterate through each line in lyrics
+    for line in lyrics_tokenized:
+        comp = sid.polarity_scores(line)
+        comp = comp['compound']
+        if comp >= 0.5:
+            positive += 1
+        elif comp > -0.5 and comp < 0.5:
+            neutral += 1
         else:
-            print(colored(song, 'blue'), 'by', colored(artist, 'blue'), 'is a ', colored('negative', 'red'), 'song')
-            print(percent_negative, 'vs', percent_positive)
+            negative += 1
+
+    percent_positive = (positive/float(negative + positive + neutral))*100
+    percent_negative = (negative/float(negative + positive + neutral))*100
+
+    if percent_positive == 0.0 and percent_negative == 0.0:
+        # accounts for most EDM
+        print(colored(song, 'blue'), 'by', colored(artist, 'blue'), 'is a ', colored('positive', 'green'), 'song')
+        print(percent_positive, 'vs', percent_negative)
+    elif abs(percent_positive - percent_negative) < 2:
+        # songs between positive/negative
+        print(colored(song, 'blue'), 'by', colored(artist, 'blue'), 'is a ', colored('mellow', 'cyan'), 'song')
+        print(percent_positive, 'vs', percent_negative)
+    elif percent_positive > percent_negative:
+        # positive songs
+        print(colored(song, 'blue'), 'by', colored(artist, 'blue'), 'is a ', colored('positive', 'green'), 'song')
+        print(percent_positive, 'vs', percent_negative)
+    else:
+        # negative songs
+        print(colored(song, 'blue'), 'by', colored(artist, 'blue'), 'is a ', colored('negative', 'red'), 'song')
+        print(percent_negative, 'vs', percent_positive)
 
 def main():
-    artists = {
-        'happy' : 'pharrellwilliams',
-        'scartissue' : 'Red Hot Chili Peppers',
-        'blu' : 'Jon Bellion',
-        'loveride' : 'christianfrench',
-        'revenge' : 'xxxtentacion',
-        'fromtime' : 'drake',
-        'aintnobodylovesmebetter' : 'felixjaehn',
-        'lovelies' : 'khalidnormani',
-        'psycho' : 'postmalone',
-        'allgirlsarethesame' : 'juicewrld',
-        'jealous' : 'giannikyle',
-        'yellow' : 'coldplay',
-        'come & go' : 'juice wrld',
-    }
-
-    process_artists(artists=artists)
+    process_artists(song=sys.argv[1], artist=sys.argv[2])
     
 if __name__ == "__main__":
     main()
