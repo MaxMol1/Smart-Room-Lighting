@@ -2,20 +2,16 @@
 
 ### Introduction
 
-This is a project aiming to map songs to colors based on the sentiment of the lyrics. These colors are then displayed on an LED strip via communication over wifi with an ESP8266 microcontroller in a sound-reactive manner.
+This is a project that uses localhost to show information in real time about songs that a Spotify user plays including the lyrics, genres, release date, and mood. It also includes a sentiment analyzer that maps colors to a song based on the sentiment of its lyrics.
 
-### Fetching Lyrics
-Navigate to the lyrics directory and run ./wrapper_fetch_lyrics.sh with the arguments for song name and artist to fetch lyrics using the Genius API.
+This project supports communication over WiFi with an ESP8266 microcontroller for the purpose of broadcasting the colors of the current song to lights and LED strips to match the mood.
 
-```./wrapper_fetch_lyrics.sh "Bohemian Rhapsody" "Queen"```
+### Starting the Server
+
+Navigate to the lyrics directory and run ```node app.js```. This will start up a server on localhost:3000 where you can log in with your spotify account. After doing so, click the button **Start Tracking** to see live results of the current song that you have playing.
 
 ### Classifying Song
-Navigate to the models directory and run python3 model.py with the same arguments as described above to classify a song as **positive**, **negative**, or **mellow**.
 
-**Note:** Make sure to enter the song name and artist exactly (some song names have multiple artists or unexpectedly long names).
+Navigate to the models directory and run python3 model.py with the arguments for song name and artist to classify a song as **positive**, **negative**, or **mellow**.
 
-### TODO
-1. Authenticate with Spotify to fetch current playing song in real time
-2. Pipe output into sentiment classifier and translate response to certain colors
-3. Set up communication between ESP8266 and classifier
-3. Create a sound reactive visualization using fourier transformations
+**Note:** Make sure to enter the song name and artist exactly and surrounded by quotations (some song names have multiple artists or unexpectedly long names).
