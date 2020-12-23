@@ -3,4 +3,4 @@
 # args (no spaces)
 # * 1st - song name
 # * 2nd - artist
-node genius.js $1 $2
+node ./public/genius.js $1 $2

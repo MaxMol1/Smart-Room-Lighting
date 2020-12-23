@@ -1,4 +1,3 @@
-const fetch = require("node-fetch");
 const cheerio = require('cheerio')
 const Genius = require('genius-api');
 
@@ -62,7 +61,7 @@ async function Main() {
     })
 
     if (songUrl == undefined)
-        throw new Error("Song not found for artist" + artist_name);
+        throw new Error("Song not found for artist " + artist_name);
 
     /* 4. Fetch and parse html from song url */
     const songHTML = await genius.getSongHTML(songUrl)
