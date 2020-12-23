@@ -1,6 +1,3 @@
-const cheerio = require('cheerio')
-const Genius = require('genius-api');
-
 async function Main() {
     /* Function to normalize names */
     const normalizeName = name => name.replace(/[^\w]/g, '').toLowerCase()
@@ -34,7 +31,7 @@ async function Main() {
     }
 
     // genius access token
-    const accessToken = 'XfpcBSGdEivzTpfOBtxy6hwKgBLFOYRb5Zla2UADZp9MVVV3xBsTFZ9FUK1wwv3q'
+    const accessToken = ''
     const genius = new Genius(accessToken)
     
     // artist and song for which to find lyrics

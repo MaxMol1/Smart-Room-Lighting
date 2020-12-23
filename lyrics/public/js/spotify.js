@@ -62,10 +62,3 @@ async function track_songs() {
         console.log("stopped tracking...");
     })();
 }
-
-// TODO:
-// 1. get genre using other endpoint
-// * see what other information I can get
-// 2. clean css to make it look nice
-// 3. fix genius and lyrics
-// 4. call the led api

@@ -1,5 +1,8 @@
 var express = require('express');
 const path = require('path');
+const fetch = require('node-fetch');
+const cheerio = require('cheerio');
+const Genius = require('genius-api');
 
 /* Global Vars */
 const CLIENT_ID = '';
