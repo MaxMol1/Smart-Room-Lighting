@@ -9,7 +9,16 @@ ACCESS_TOKEN = ''
 headers = { 'Authorization' : 'Bearer ' + ACCESS_TOKEN }
 
 def normalize(str):
-    return re.sub(r'[^A-Za-z0-9]+', '', str).lower()
+    # remove remix from song name
+    if "remix" in str or "Remix" in str or "REMIX" in str:
+        try:
+            str = str[:str.rindex('-')]
+        except:
+            print ("Inconsistent song naming")
+    # keep only alphanumeric characters and remove feat/with features from song name
+    str = re.sub(r'\(.*\)', '', str)
+    str = re.sub(r'[^A-Za-z0-9]+', '', str).lower()
+    return str
 
 def get_lyrics(name, artist):
     name = normalize(name)

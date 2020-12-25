@@ -1,0 +1,5 @@
+Flask==1.1.2
+requests==2.24.0
+urllib3==1.25.10
+regex==2020.11.13
+beautifulsoup4==4.9.3

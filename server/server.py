@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, jsonify
 import requests
 import json
 from urllib.parse import quote
@@ -15,7 +15,15 @@ SCOPES = 'user-read-private user-read-currently-playing user-read-playback-state
 AUTH_ENDPOINT = 'https://accounts.spotify.com/authorize'
 TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token'
 
-app = Flask(__name__)
+# Create custom Flask to be able to use Vue syntax
+class CustomFlask(Flask):
+  jinja_options = Flask.jinja_options.copy()
+  jinja_options.update(dict(
+    variable_start_string='%%',
+    variable_end_string='%%',
+  ))
+
+app = CustomFlask(__name__)
 
 # Auth endpoint
 @app.route('/')
@@ -59,8 +67,8 @@ def track():
   song_data = track_current_song(options)
   song_data['lyrics'] = get_lyrics(song_data['name'], song_data['artists'][0]['name'])
 
-  return render_template('index.html', name=song_data['name'], artist=song_data['artists'][0]['name'], 
-    date=song_data['date'], pop=song_data['pop'], lyrics=song_data['lyrics'])
+  return jsonify({'name' : song_data['name'], 'artist' : song_data['artists'][0]['name'], 
+    'date' : song_data['date'], 'pop' : song_data['pop'], 'lyrics' : song_data['lyrics']})
 
 if __name__ == "__main__":
   app.run(port=3000)

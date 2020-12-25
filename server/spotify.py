@@ -11,7 +11,7 @@ def track_current_song(options):
     song_data['name'] = res['item']['name']
     song_data['artists'] = res['item']['artists']
     song_data['date'] = res['item']['album']['release_date']
-    # const genre = current_play_data.item.artists
+    # genre
     song_data['pop'] = res['item']['popularity']
 
     return song_data
