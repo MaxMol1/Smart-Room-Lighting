@@ -1,0 +1,24 @@
+html, body {
+    min-height: 100% !important;
+    width: 100% !important;
+    margin: 0;
+    padding: 0;
+    background: rgb(236, 240, 241);
+}
+
+.btn {
+    width: 150px;
+    color: #3bc0ec;
+    background-color: white;
+    border: 2px solid #7ed3f0;
+    transition: 0.35s;
+}
+
+.btn:hover, .btn:focus {
+    box-shadow: inset 10em 0 0 0 #7ed3f0;
+    color: white;
+}
+
+.hide, .abort-btn {
+    display: none;
+}

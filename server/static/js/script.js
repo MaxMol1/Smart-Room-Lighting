@@ -1,22 +1,22 @@
 /* Vue object */
-var songdata = new Vue({
-    el: "#songdata",
+var songData = new Vue({
+    el: "#songData",
     data: {
         name : '',
-        artist : '',
         lyrics : '',
         date : '',
         genre : '',
-        pop : ''
+        pop : '',
+        cover: ''
     },
     methods: {
-        change_song: function (name, artist, lyrics, date, genre, pop) {
-            this.name = name
-            this.artist = artist
-            this.lyrics = lyrics
-            this.date = date
-            this.genre = genre
-            this.pop = pop
+        changeSong: function (name, artist, lyrics, date, genre, pop, cover) {
+            this.name = name + ' - ' + artist;
+            this.lyrics = lyrics;
+            this.date = date;
+            this.genre = genre;
+            this.pop = pop;
+            this.cover = cover;
         }
     }
 });
@@ -24,26 +24,57 @@ var songdata = new Vue({
 const delay = ms => new Promise(res => setTimeout(res, ms));
 var abort;
 
-function set_abort() {
-    abort = true;
+function showElements() {
+    var hidden = document.getElementsByClassName('hide');
+    for (i = 0; i < hidden.length; i++) {
+        hidden[i].style.display = 'inline-block';
+    }
 }
 
-async function start_tracking() {
+function hideElements() {
+    var hidden = document.getElementsByClassName('hide');
+    for (i = 0; i < hidden.length; i++) {
+        hidden[i].style.display = 'none';
+    }
+}
+
+async function startTracking() {
     abort = false
 
+    // swap buttons
+    var trackBtn = document.getElementsByClassName('track-btn');
+    var abortBtn = document.getElementsByClassName('abort-btn');
+    trackBtn[0].style.display = 'none';
+    abortBtn[0].style.display = 'inline-block';
+
+    // start tracking
     while (true) {
-        if (abort)
-            break
+        if (abort) {
+            break;
+        }
 
-        console.log("fetching song...")
+        console.log("fetching song ...");
 
-        let temp_data
         await $.ajax("/track").done(async function (data) {
-            temp_data = data;
+            if (data['name'] !== '' & !abort) {
+                songData.changeSong(data.name, data.artist, data.lyrics, data.date, '', data.pop, data.cover);
+                showElements();
+            }
         });
 
-        songdata.change_song(temp_data.name, temp_data.artist, temp_data.lyrics, temp_data.date, "none", temp_data.pop);    
         // Wait two seconds
         await delay(2000);
     }
+}
+
+async function stopTracking() {
+    // hide elements and stop tracking
+    abort = true;
+    hideElements();
+
+    // swap buttons
+    var trackBtn = document.getElementsByClassName('track-btn');
+    var abortBtn = document.getElementsByClassName('abort-btn');
+    trackBtn[0].style.display = 'inline-block';
+    abortBtn[0].style.display = 'none';
 }

@@ -1,42 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Spotify App</title>
+<title>Spotify Song Tracker</title>
 <!-- Bootstrap -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<!-- Custom -->
+<link rel="stylesheet" href="../static/css/style.css">
 </head>
 <body>
 
-<div class="fluid-container">
-    <div class="row">
-        <div class="col-12 text-center">
-            <h1 class="mt-4" style="margin-bottom: 50px;">Spotify Song Analysis</h1>
+<div class="container">
+    <div class="row mt-5" id="songData">
+        <div class="hide col-12 col-md-4 text-center">
+            <img :src="cover" style="width:100%;" alt="">
+	        <h4 class="mt-5 mb-5"> {{ name }} </h4>
+            <h5>Release Date:</h5>
+            <p>{{ date }}</p>
+            <h5>Genre:</h5>
+            <p>{{ genre }}</p>
+            <h5>Popularity:</h5>
+            <p>{{ pop }}</p>
+        </div>
+        <div class="hide col-12 col-md-8 text-center">
+            <h4 class="mb-5">Lyrics:</h4>
+            <p style="width: 600px; margin: 0 auto;">{{ lyrics }}</p>
+            <h3 id="test"></h3>
         </div>
     </div>
     <div class="row mb-5">
-        <div class="col-12 text-center">
-            <!-- <form id="track_form" method="POST" action="/track"><input type="submit"/></form> -->
-            <button class="btn btn-primary" onclick="start_tracking()">Start Tracking</button>
-            <button class="btn btn-primary" onclick="set_abort()">Stop Tracking</button>
-        </div>
-    </div>
-    <div class="row mt-5" id="songdata">
-        <div class="col-4 text-center">
-            <h4>Name:</h4>
-	        <p> {{ name }} </p>
-            <h4>Artist:</h4>
-            <p>{{ artist }}</p>
-            <h4>Genre:</h4>
-            <p>{{ genre }}</p>
-            <h4>Release Date:</h4>
-            <p>{{ date }}</p>
-            <h4>Popularity:</h4>
-            <p>{{ pop }}</p>
-        </div>
-        <div class="col-8 text-center">
-            <h4>Lyrics:</h4>
-            <p style="width: 600px; margin: 0 auto;">{{ lyrics }}</p>
-            <h3 id="test"></h3>
+        <div class="col-12 text-center mt-5">
+            <button type="button" class="track-btn btn btn-lg btn-rounded" onclick="startTracking()">Track</button>
+            <button type="button" class="abort-btn btn btn-lg btn-rounded" onclick="stopTracking()">Stop</button>
         </div>
     </div>
 </div>
@@ -48,6 +42,6 @@
 <!-- Vue.js -->
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
 <!-- Custom -->
-<script src="/static/js/script.js"></script>
+<script src="../static/js/script.js"></script>
 </body>
 </html>
