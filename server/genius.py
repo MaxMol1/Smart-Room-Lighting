@@ -12,47 +12,54 @@ def normalize(str):
     # remove remix from song name
     if "remix" in str or "Remix" in str or "REMIX" in str:
         try:
+            # e.g. - [artist] remix
             str = str[:str.rindex('-')]
         except:
-            print ("Inconsistent song naming")
+            try:
+                # e.g. (remix)
+                str = str[:str.rindex('(')]
+            except:
+                print('Inconsistent naming convention!')
     # keep only alphanumeric characters and remove feat/with features from song name
     str = re.sub(r'\(.*\)', '', str)
     str = re.sub(r'[^A-Za-z0-9]+', '', str).lower()
     return str
 
-def get_lyrics(name, artist):
+def getLyrics(name, artist):
     name = normalize(name)
     artist = normalize(artist)
     
     # 1. Get artist ID using artist name
-    search_params = { 'q': artist }
-    res = (requests.get(GENIUS_URL + '/search/' , params=search_params, headers=headers)).json()
+    searchParams = { 'q': artist }
+    res = (requests.get(GENIUS_URL + '/search/' , params=searchParams, headers=headers)).json()
 
-    artist_id = ''
+    artistId = ''
     for hit in res['response']['hits']:
         if hit['type'] == 'song' and normalize(hit['result']['primary_artist']['name']) == artist:
-            artist_id = hit['result']['primary_artist']['id']
+            artistId = hit['result']['primary_artist']['id']
             break
     
     # 2. Get top 50 songs by artist
-    song_params = { 'id' : artist_id, 'per_page' : '50', 'sort' : 'popularity' }
-    res = (requests.get(GENIUS_URL + '/artists/' + str(artist_id) + '/songs/', params=song_params, headers=headers)).json()
+    songParams = { 'id' : artistId, 'per_page' : '50', 'sort' : 'popularity' }
+    res = (requests.get(GENIUS_URL + '/artists/' + str(artistId) + '/songs/', params=songParams, headers=headers)).json()
 
     # 3. Get correct song url from list of 50 songs
-    song_url = ''
+    songUrl = ''
     for song in res['response']['songs']:
         if normalize(song['title']) == name:
-            song_url = song['url']
+            songUrl = song['url']
             break
 
     # song not found
-    if not song_url:
+    if not songUrl:
         raise Exception('Song not found for artist:' + artist)
 
     # 4. Fetch and parse html from song url
-    page = requests.get(song_url)
+    page = requests.get(songUrl)
     html = BeautifulSoup(page.text, "html.parser")
     
     # 5. Return lyrics
-    lyrics = html.find("div", class_="lyrics").get_text()
-    return lyrics
+    try:
+        return html.find("div", class_="lyrics").get_text()
+    except:
+        return ''

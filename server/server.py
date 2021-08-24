@@ -1,9 +1,8 @@
 from flask import Flask, request, redirect, render_template, jsonify
 import requests
-import json
 from urllib.parse import quote
-from spotify import track_current_song
-from genius import get_lyrics
+from spotify import trackCurrentSong
+from genius import getLyrics
 
 # INPUT CLIENT ID HERE
 CLIENT_ID = ''
@@ -28,12 +27,12 @@ app = CustomFlask(__name__)
 # Auth endpoint
 @app.route('/')
 def index():
-  authentication_url = (AUTH_ENDPOINT +
+  authenticationUrl = (AUTH_ENDPOINT +
   '?response_type=code&client_id=' + CLIENT_ID +
   '&scope=' + quote(SCOPES) +
   '&redirect_uri=' + quote(REDIRECT_URI))
   
-  return redirect(authentication_url)
+  return redirect(authenticationUrl)
 
 # Callback endpoint
 @app.route('/callback')
@@ -64,11 +63,21 @@ def home():
 
 @app.route('/track', methods=['GET', 'POST'])
 def track():
-  song_data = track_current_song(options)
-  song_data['lyrics'] = get_lyrics(song_data['name'], song_data['artists'][0]['name'])
+  songData = trackCurrentSong(options)
 
-  return jsonify({'name' : song_data['name'], 'artist' : song_data['artists'][0]['name'], 
-    'date' : song_data['date'], 'pop' : song_data['pop'], 'lyrics' : song_data['lyrics']})
+  if songData == {}:
+    print ('No song playing, or song not found ...')
+    return jsonify({'name' : '', 'artist' : '', 'date' : '', 'pop' : '', 'lyrics' : '', 'cover' : ''})
+
+  songData['lyrics'] = getLyrics(songData['name'], songData['artists'][0]['name'])
+
+  if songData['lyrics'] == '':
+    print ('Lyrics not found ...')
+    songData['lyrics'] = 'Could not fetch lyrics'
+
+  return jsonify({'name' : songData['name'], 'artist' : songData['artists'][0]['name'],
+    'date' : songData['date'], 'pop' : songData['pop'], 'lyrics' : songData['lyrics'],
+    'cover' : songData['cover']})
 
 if __name__ == "__main__":
   app.run(port=3000)
