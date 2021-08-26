@@ -26,24 +26,6 @@ h3 {
     font-size: 16px;
 }
 
-img {
-    height: 90%;
-    width: 90%;
-}
-
-.song-info {
-    padding-left: 40px;
-}
-
-.card {
-    border-radius: 2%;
-}
-
-.card-body {
-    min-height: 621.4px;
-    padding: 40px;
-}
-
 .btn {
     width: 150px;
     color: #3bc0ec;
@@ -59,4 +41,34 @@ img {
 
 .hide, .abort-btn {
     display: none;
+}
+
+.card {
+    border-radius: 2%;
+}
+
+.card-body {
+    min-height: 621.4px;
+    padding: 40px;
+}
+
+img {
+    height: 90%;
+    width: 90%;
+}
+
+.song-info {
+    padding-left: 40px;
+}
+
+.lyrics-container {
+    width: 600px;
+    margin: 0 auto;
+}
+
+@media only screen and (max-width: 600px) {
+    .lyrics-container {
+        width: 400px;
+        margin: 0 auto;
+    }
 }
