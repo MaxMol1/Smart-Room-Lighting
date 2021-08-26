@@ -2,21 +2,17 @@ import requests
 
 CURRENTLY_PLAYING_ENDPOINT = 'https://api.spotify.com/v1/me/player/currently-playing'
 
-# Returns dictionary after tracking song information
+# Returns currently playing song and info
 def trackCurrentSong(options):
-    songData = {}
-    res = {}
-
     try:
         res = (requests.get(CURRENTLY_PLAYING_ENDPOINT, headers=options)).json()
     except:
-        return {}
+        raise Exception('FAILED to track current playing song!')
 
-    songData['name'] = res['item']['name']
-    songData['artists'] = res['item']['artists']
-    songData['date'] = res['item']['album']['release_date']
-    songData['cover'] = res['item']['album']['images'][0]['url']
-    # genre
-    songData['pop'] = res['item']['popularity']
-
-    return songData
+    return {
+        'name': res['item']['name'],
+        'artists': res['item']['artists'],
+        'date': res['item']['album']['release_date'],
+        'cover': res['item']['album']['images'][0]['url'],
+        'pop': res['item']['popularity']
+    }

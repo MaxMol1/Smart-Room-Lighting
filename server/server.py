@@ -4,9 +4,9 @@ from urllib.parse import quote
 from spotify import trackCurrentSong
 from genius import getLyrics
 
-# INPUT CLIENT ID HERE
+# INPUT YOUR CLIENT ID HERE
 CLIENT_ID = ''
-# INPUT CLIENT SECRET HERE
+# INPUT YOUR CLIENT SECRET HERE
 CLIENT_SECRET = ''
 REDIRECT_URI = 'http://127.0.0.1:3000/callback'
 SCOPES = 'user-read-private user-read-currently-playing user-read-playback-state'
@@ -63,21 +63,36 @@ def home():
 
 @app.route('/track', methods=['GET', 'POST'])
 def track():
-  songData = trackCurrentSong(options)
+  # track general song data
+  try:
+    songData = trackCurrentSong(options)
+  except Exception as e:
+    print (e)
+    return jsonify({
+      'name' : '',
+      'artist' : '',
+      'date' : '',
+      'pop' : '',
+      'lyrics' : '',
+      'cover' : ''
+    })
 
-  if songData == {}:
-    print ('No song playing, or song not found ...')
-    return jsonify({'name' : '', 'artist' : '', 'date' : '', 'pop' : '', 'lyrics' : '', 'cover' : ''})
-
-  songData['lyrics'] = getLyrics(songData['name'], songData['artists'][0]['name'])
-
-  if songData['lyrics'] == '':
-    print ('Lyrics not found ...')
+  # track song lyrics
+  try:
+    songData['lyrics'] = getLyrics(songData['name'], songData['artists'][0]['name'])
+  except Exception as e:
+    print (e)
     songData['lyrics'] = 'Could not fetch lyrics'
 
-  return jsonify({'name' : songData['name'], 'artist' : songData['artists'][0]['name'],
-    'date' : songData['date'], 'pop' : songData['pop'], 'lyrics' : songData['lyrics'],
-    'cover' : songData['cover']})
+  # return information to display on page
+  return jsonify({
+    'name' : songData['name'],
+    'artist' : songData['artists'][0]['name'],
+    'date' : songData['date'],
+    'pop' : songData['pop'],
+    'lyrics' : songData['lyrics'],
+    'cover' : songData['cover']
+  })
 
 if __name__ == "__main__":
   app.run(port=3000)
