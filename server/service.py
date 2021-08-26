@@ -70,6 +70,9 @@ def getSongInformation(spotifyOptions, geniusOptions):
         
         # Get the correct Genius song url for the song name
         res = getArtistTopSongs(artistId=artistId, params={'id' : artistId, 'per_page' : '50', 'sort' : 'popularity'}, geniusOptions=geniusOptions)
+
+        # TODO: throw error if action forbidden
+
         songUrl = ''
         for song in res['response']['songs']:
             titleNorm = normalize(song['title'])
@@ -79,15 +82,18 @@ def getSongInformation(spotifyOptions, geniusOptions):
                 break
 
         if not songUrl:
-            raise Exception('FAILED to find song for artist')
+            raise Exception('FAILED to find current playing song for artist on Genius')
 
         # Fetch and parse Genius html from song url
         res = getGeniusSongUrlRes(songUrl=songUrl)
         html = BeautifulSoup(res.text, "html.parser")
-        # TODO: lyric fetching method is deprecated
-        lyrics = html.find("div", class_="lyrics").get_text()
+        delimiter = '**'
+        for br in html.findAll('br'):
+            br.replaceWith(delimiter)
+        for lyricsContainer in html.select('div[class*="Lyrics__Container-"]'):
+            lyricsSegment = lyricsContainer.get_text().split(delimiter)
+            songDetails['lyrics'] += "\n".join(line for line in lyricsSegment)
 
-        songDetails['lyrics'] = lyrics
     except Exception as e:
         print (e)
 
