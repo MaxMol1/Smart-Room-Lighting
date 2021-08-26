@@ -8,12 +8,10 @@ SPOTIFY_CLIENT_ID = ''
 SPOTIFY_CLIENT_SECRET = ''
 # INPUT YOUR GENIUS ACCESS TOKEN HERE
 GENIUS_ACCESS_TOKEN = ''
-
+SPOTIFY_AUTH_ENDPOINT = 'https://accounts.spotify.com/authorize'
+SPOTIFY_TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token'
+SPOTIFY_SCOPES = 'user-read-private user-read-currently-playing user-read-playback-state'
 REDIRECT_URI = 'http://127.0.0.1:3000/callback'
-SCOPES = 'user-read-private user-read-currently-playing user-read-playback-state'
-
-AUTH_ENDPOINT = 'https://accounts.spotify.com/authorize'
-TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token'
 
 # Create custom Flask to be able to use Vue syntax
 class CustomFlask(Flask):
@@ -28,12 +26,12 @@ app = CustomFlask(__name__)
 # Auth endpoint
 @app.route('/')
 def index():
-  authenticationUrl = (AUTH_ENDPOINT +
+  authUrl = (SPOTIFY_AUTH_ENDPOINT +
   '?response_type=code&client_id=' + SPOTIFY_CLIENT_ID +
-  '&scope=' + quote(SCOPES) +
+  '&scope=' + quote(SPOTIFY_SCOPES) +
   '&redirect_uri=' + quote(REDIRECT_URI))
   
-  return redirect(authenticationUrl)
+  return redirect(authUrl)
 
 # Callback endpoint
 @app.route('/callback')
@@ -47,8 +45,7 @@ def callback():
   }
 
   # Obtain access and refresh tokens
-  SPOTIFY_ACCESS_TOKEN = requests.post(TOKEN_ENDPOINT, payload).json()['access_token']
-  
+  SPOTIFY_ACCESS_TOKEN = requests.post(SPOTIFY_TOKEN_ENDPOINT, payload).json()['access_token']
   # REFRESH_TOKEN = res['refresh_token']
   # EXPIRES_IN = res['expires_in']
   
