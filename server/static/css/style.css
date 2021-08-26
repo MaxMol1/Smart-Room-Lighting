@@ -1,9 +1,47 @@
-html, body {
-    min-height: 100% !important;
-    width: 100% !important;
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    min-height: 100%;
     margin: 0;
     padding: 0;
     background: rgb(236, 240, 241);
+}
+
+h1 {
+    font-size: 24px;
+}
+
+h2 {
+    font-size: 20px;
+}
+
+h3 {
+    font-size: 16px;
+}
+
+img {
+    height: 90%;
+    width: 90%;
+}
+
+.song-info {
+    padding-left: 40px;
+}
+
+.card {
+    border-radius: 2%;
+}
+
+.card-body {
+    min-height: 621.4px;
+    padding: 40px;
 }
 
 .btn {

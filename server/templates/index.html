@@ -10,27 +10,37 @@
 <body>
 
 <div class="container">
-    <div class="row mt-5" id="songData">
-        <div class="hide col-12 col-md-4 text-center">
-            <img :src="cover" style="width:100%;" alt="">
-	        <h4 class="mt-5 mb-5"> {{ name }} </h4>
-            <h5>Release Date:</h5>
-            <p>{{ date }}</p>
-            <h5>Genre:</h5>
-            <p>{{ genre }}</p>
-            <h5>Popularity:</h5>
-            <p>{{ pop }}</p>
-        </div>
-        <div class="hide col-12 col-md-8 text-center">
-            <h4 class="mb-5">Lyrics:</h4>
-            <p style="width: 600px; margin: 0 auto;">{{ lyrics }}</p>
-            <h3 id="test"></h3>
-        </div>
-    </div>
-    <div class="row mb-5">
-        <div class="col-12 text-center mt-5">
-            <button type="button" class="track-btn btn btn-lg btn-rounded" onclick="startTracking()">Track</button>
-            <button type="button" class="abort-btn btn btn-lg btn-rounded" onclick="stopTracking()">Stop</button>
+    <div class="row" id="songData">
+        <div class="col-12">
+            <div class="card mt-5">
+                <div class="card-body">
+                    <!-- Song Details -->
+                    <div class="row">
+                        <div class="hide col-12 col-md-4">
+                            <div class="text-center">
+                                <img :src="cover" alt="">
+                                <h2 class="mt-4 mb-4"> {{ name }} </h2>
+                            </div>
+                            <div class="text-left song-info">
+                                <h3><strong>Release Date: </strong>{{ date }}</h3>
+                                <h3><strong>Main Genre: </strong>{{ genre }}</h3>
+                                <h3><strong>Popularity: </strong>{{ pop }}</h3>
+                            </div>
+                        </div>
+                        <div class="hide col-12 col-md-8 text-center">
+                            <h1 class="mb-5">Lyrics:</h1>
+                            <p style="width: 600px; margin: 0 auto;">{{ lyrics }}</p>
+                        </div>
+                    </div>
+                    <!-- Buttons -->
+                    <div class="row">
+                        <div class="col-12 text-center mt-5">
+                            <button type="button" class="track-btn btn btn-lg btn-rounded" onclick="startTracking()">Track</button>
+                            <button type="button" class="abort-btn btn btn-lg btn-rounded" onclick="stopTracking()">Stop</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
