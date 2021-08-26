@@ -70,9 +70,6 @@ def getSongInformation(spotifyOptions, geniusOptions):
         
         # Get the correct Genius song url for the song name
         res = getArtistTopSongs(artistId=artistId, params={'id' : artistId, 'per_page' : '50', 'sort' : 'popularity'}, geniusOptions=geniusOptions)
-
-        # TODO: throw error if action forbidden
-
         songUrl = ''
         for song in res['response']['songs']:
             titleNorm = normalize(song['title'])
