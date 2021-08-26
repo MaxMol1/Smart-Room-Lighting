@@ -1,13 +1,14 @@
 from flask import Flask, request, redirect, render_template, jsonify
 import requests
 from urllib.parse import quote
-from spotify import trackCurrentSong
-from genius import getLyrics
+from service import getSongInformation
 
-# INPUT YOUR CLIENT ID HERE
-CLIENT_ID = ''
-# INPUT YOUR CLIENT SECRET HERE
-CLIENT_SECRET = ''
+# INPUT YOUR SPOTIFY CLIENT ID AND CLIENT SECRET HERE
+SPOTIFY_CLIENT_ID = ''
+SPOTIFY_CLIENT_SECRET = ''
+# INPUT YOUR GENIUS ACCESS TOKEN HERE
+GENIUS_ACCESS_TOKEN = ''
+
 REDIRECT_URI = 'http://127.0.0.1:3000/callback'
 SCOPES = 'user-read-private user-read-currently-playing user-read-playback-state'
 
@@ -28,7 +29,7 @@ app = CustomFlask(__name__)
 @app.route('/')
 def index():
   authenticationUrl = (AUTH_ENDPOINT +
-  '?response_type=code&client_id=' + CLIENT_ID +
+  '?response_type=code&client_id=' + SPOTIFY_CLIENT_ID +
   '&scope=' + quote(SCOPES) +
   '&redirect_uri=' + quote(REDIRECT_URI))
   
@@ -39,21 +40,21 @@ def index():
 def callback():
   payload = {
     'grant_type': 'authorization_code',
-    'client_id': CLIENT_ID,
-    'client_secret': CLIENT_SECRET,
+    'client_id': SPOTIFY_CLIENT_ID,
+    'client_secret': SPOTIFY_CLIENT_SECRET,
     'code': str(request.args['code']),
     'redirect_uri': REDIRECT_URI,
   }
 
   # Obtain access and refresh tokens
-  res = (requests.post(TOKEN_ENDPOINT, payload)).json()
+  SPOTIFY_ACCESS_TOKEN = requests.post(TOKEN_ENDPOINT, payload).json()['access_token']
   
-  ACCESS_TOKEN = res['access_token']
   # REFRESH_TOKEN = res['refresh_token']
   # EXPIRES_IN = res['expires_in']
   
-  global options
-  options = {'Authorization' : 'Bearer ' + ACCESS_TOKEN}
+  global spotifyOptions, geniusOptions
+  spotifyOptions = { 'Authorization' : 'Bearer ' + SPOTIFY_ACCESS_TOKEN }
+  geniusOptions = { 'Authorization' : 'Bearer ' + GENIUS_ACCESS_TOKEN }
 
   return redirect('/home')
 
@@ -63,36 +64,8 @@ def home():
 
 @app.route('/track', methods=['GET', 'POST'])
 def track():
-  # track general song data
-  try:
-    songData = trackCurrentSong(options)
-  except Exception as e:
-    print (e)
-    return jsonify({
-      'name' : '',
-      'artist' : '',
-      'date' : '',
-      'pop' : '',
-      'lyrics' : '',
-      'cover' : ''
-    })
-
-  # track song lyrics
-  try:
-    songData['lyrics'] = getLyrics(songData['name'], songData['artists'][0]['name'])
-  except Exception as e:
-    print (e)
-    songData['lyrics'] = 'Could not fetch lyrics'
-
-  # return information to display on page
-  return jsonify({
-    'name' : songData['name'],
-    'artist' : songData['artists'][0]['name'],
-    'date' : songData['date'],
-    'pop' : songData['pop'],
-    'lyrics' : songData['lyrics'],
-    'cover' : songData['cover']
-  })
+  songDetails = getSongInformation(spotifyOptions, geniusOptions)
+  return jsonify(songDetails)
 
 if __name__ == "__main__":
   app.run(port=3000)
