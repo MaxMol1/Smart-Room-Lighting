@@ -16,7 +16,7 @@ var songData = new Vue({
             this.cover = cover;
             this.pop = pop;
             this.genre = genre;
-            this.lyrics = lyrics;
+            this.lyrics = (lyrics === '') ? 'Lyrics not found ...' : lyrics;
         }
     }
 });
@@ -57,8 +57,6 @@ async function startTracking() {
 
         await $.ajax("/track").done(async function (data) {
             if (data['name'] !== '' & !abort) {
-                console.log('genres:' + data.genres)
-                console.log('genre:' + data.genres[0])
                 songData.changeSong(data.name, data.artist, data.date, data.cover, data.pop, data.genres[0], data.lyrics);
                 showElements();
             }
