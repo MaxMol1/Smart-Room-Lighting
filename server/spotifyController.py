@@ -11,7 +11,7 @@ def trackCurrentSong(spotifyOptions):
         raise Exception('FAILED to track current playing song')
 
 # Returns genre of current playing song
-def trackCurrentSongGenre(artistId, spotifyOptions):
+def trackCurrentSongGenres(artistId, spotifyOptions):
     try:
         return requests.get(ARTIST_ENDPOINT + artistId, headers=spotifyOptions).json()
     except:

@@ -1,6 +1,6 @@
 import re
 from bs4 import BeautifulSoup
-from spotifyController import trackCurrentSong, trackCurrentSongGenre
+from spotifyController import trackCurrentSong, trackCurrentSongGenres
 from geniusController import getGeniusArtistId, getArtistTopSongs, getGeniusSongUrlRes
 
 def normalize(str):
@@ -44,10 +44,11 @@ def getSongInformation(spotifyOptions, geniusOptions):
         songDetails['pop'] = songRes['item']['popularity']
     except Exception as e:
         print (e)
+        return
 
     # Fetch song genres
     try:
-        genresRes = trackCurrentSongGenre(songDetails['artistId'], spotifyOptions)
+        genresRes = trackCurrentSongGenres(songDetails['artistId'], spotifyOptions)
         songDetails['genres'] = genresRes['genres']
     except Exception as e:
         print (e)
