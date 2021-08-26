@@ -28,7 +28,7 @@ def process_artists(song, artist):
     neutral = 0
 
     # get lyrics for a song from an artist
-    os.chdir('../lyrics')
+    os.chdir('../server')
     output = subprocess.check_output(["node", "genius.js", song, artist])
     os.chdir('../models')
 

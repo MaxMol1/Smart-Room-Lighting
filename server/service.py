@@ -2,6 +2,7 @@ import re
 from bs4 import BeautifulSoup
 from spotifyController import trackCurrentSong, trackCurrentSongGenres
 from geniusController import getGeniusArtistId, getArtistTopSongs, getGeniusSongUrlRes
+from models.emotionModel import getSongEmotion, getSongColor
 
 def normalize(str):
     # remove remix from song name
@@ -30,7 +31,9 @@ def getSongInformation(spotifyOptions, geniusOptions):
         'cover': '',
         'pop': '',
         'genres': [],
-        'lyrics': ''
+        'lyrics': '',
+        'emotion': '',
+        'color': ''
     }
 
     # Fetch general information
@@ -91,6 +94,12 @@ def getSongInformation(spotifyOptions, geniusOptions):
             lyricsSegment = lyricsContainer.get_text().split(delimiter)
             songDetails['lyrics'] += "\n".join(line for line in lyricsSegment)
 
+    except Exception as e:
+        print (e)
+
+    try:
+        songDetails['emotion'] = getSongEmotion(songDetails['lyrics'])
+        songDetails['color'] = getSongColor(songDetails['emotion'])
     except Exception as e:
         print (e)
 
