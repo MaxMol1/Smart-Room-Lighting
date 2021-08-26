@@ -3,20 +3,26 @@ var songData = new Vue({
     el: "#songData",
     data: {
         name : '',
-        lyrics : '',
         date : '',
-        genre : '',
+        cover: '',
         pop : '',
-        cover: ''
+        lyrics : '',
+        genre : '',
+        color : {
+            'r' : 236,
+            'g' : 240,
+            'b' : 241
+        }
     },
     methods: {
-        changeSong: function (name, artist, date, cover, pop, genre, lyrics) {
+        changeSong: function (name, artist, date, cover, pop, genre, lyrics, color) {
             this.name = name + ' - ' + artist;
             this.date = date;
             this.cover = cover;
             this.pop = pop;
             this.genre = genre;
             this.lyrics = (lyrics === '') ? 'Lyrics not found ...' : lyrics;
+            this.color = color;
         }
     }
 });
@@ -57,7 +63,7 @@ async function startTracking() {
 
         await $.ajax("/track").done(async function (data) {
             if (data['name'] !== '' & !abort) {
-                songData.changeSong(data.name, data.artist, data.date, data.cover, data.pop, data.genres[0], data.lyrics);
+                songData.changeSong(data.name, data.artist, data.date, data.cover, data.pop, data.genres[0], data.lyrics, data.color);
                 showElements();
             }
         });

@@ -9,33 +9,35 @@
 </head>
 <body>
 
-<div class="container">
-    <div class="row" id="songData">
-        <div class="col-12">
-            <div class="card mt-5 mb-5">
-                <div class="card-body">
-                    <!-- Song Details -->
-                    <div class="row">
-                        <div class="hide col-12 col-md-6">
-                            <div class="text-center">
-                                <img :src="cover" alt="">
-                                <h2 class="mt-4 mb-4"> {{ name }} </h2>
+<div class="container-fluid" id="songData" :style="{ 'background-color': `rgb(${color.r}, ${color.g}, ${color.b})`}">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card mt-5 mb-5">
+                    <div class="card-body">
+                        <!-- Song Details -->
+                        <div class="row">
+                            <div class="hide col-12 col-md-6">
+                                <div class="text-center">
+                                    <img :src="cover" alt="">
+                                    <h2 class="mt-4 mb-4"> {{ name }} </h2>
+                                </div>
+                                <div class="text-left song-info">
+                                    <h3><strong>Release Date: </strong>{{ date }}</h3>
+                                    <h3><strong>Main Genre: </strong>{{ genre }}</h3>
+                                    <h3><strong>Popularity: </strong>{{ pop }}</h3>
+                                </div>
                             </div>
-                            <div class="text-left song-info">
-                                <h3><strong>Release Date: </strong>{{ date }}</h3>
-                                <h3><strong>Main Genre: </strong>{{ genre }}</h3>
-                                <h3><strong>Popularity: </strong>{{ pop }}</h3>
+                            <div class="hide col-12 col-md-6 text-left lyrics-container">
+                                <p style="white-space: pre-line;">{{ lyrics }}</p>
                             </div>
                         </div>
-                        <div class="hide col-12 col-md-6 text-left lyrics-container">
-                            <p style="white-space: pre-line;">{{ lyrics }}</p>
-                        </div>
-                    </div>
-                    <!-- Buttons -->
-                    <div class="row">
-                        <div class="col-12 text-center mt-5">
-                            <button type="button" class="track-btn btn btn-lg btn-rounded" onclick="startTracking()">Track</button>
-                            <button type="button" class="abort-btn btn btn-lg btn-rounded" onclick="stopTracking()">Stop</button>
+                        <!-- Buttons -->
+                        <div class="row">
+                            <div class="col-12 text-center mt-5">
+                                <button type="button" class="track-btn btn btn-lg btn-rounded" onclick="startTracking()">Track</button>
+                                <button type="button" class="abort-btn btn btn-lg btn-rounded" onclick="stopTracking()">Stop</button>
+                            </div>
                         </div>
                     </div>
                 </div>
