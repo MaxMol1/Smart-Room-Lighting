@@ -21,7 +21,7 @@ var songData = new Vue({
     },
     computed: {
         createGradient() {
-            return `linear-gradient(45deg, rgba(${this.pColor.r}, ${this.pColor.g}, ${this.pColor.b}, 1) 0%, rgba(${this.sColor.r}, ${this.sColor.g}, ${this.sColor.b}, 1) 100%)`;
+            return `linear-gradient(90deg, rgba(${this.pColor.r}, ${this.pColor.g}, ${this.pColor.b}, 1) 0%, rgba(${this.sColor.r}, ${this.sColor.g}, ${this.sColor.b}, 1) 100%)`;
         }
     },
     methods: {
