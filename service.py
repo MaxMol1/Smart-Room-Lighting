@@ -1,4 +1,5 @@
 import re
+import string
 from bs4 import BeautifulSoup
 from spotifyController import trackCurrentSong, trackCurrentSongGenres
 from geniusController import getGeniusArtistId, getArtistTopSongs, getGeniusSongUrlRes
@@ -54,7 +55,7 @@ def getSongInformation(spotifyOptions, geniusOptions):
     # Fetch song genres
     try:
         genresRes = trackCurrentSongGenres(songDetails['artistId'], spotifyOptions)
-        songDetails['genres'] = genresRes['genres']
+        songDetails['genres'] = [string.capwords(x) for x in genresRes['genres']]
     except Exception as e:
         print (e)
 
