@@ -15,13 +15,12 @@ def getSongSentiment(lyrics):
     neutral = 0
 
     # split node app output into a list
-    lyrics = lyrics.split(b'\n')[1:-1]
+    lyrics = lyrics.split('\n')[1:-1]
     lyrics_tokenized = []
     
     # tokenize and remove stopwords
     for line in lyrics:
-        parsed_line = line.decode('utf-8')
-        parsed_line = tokenizer.tokenize(parsed_line.lower())
+        parsed_line = tokenizer.tokenize(line.lower())
         parsed_line = [w for w in parsed_line if not w in stop_words and not w.isnumeric()]
         parsed_line = " ".join(parsed_line)
         lyrics_tokenized.append(parsed_line)
