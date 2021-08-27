@@ -1,10 +1,10 @@
-# Sound-Reactive-LED
+# Smart-Room-Lighting
 
 ### Introduction
 
-This is a project that uses localhost to show information in real time about the current song playing on Spotify. This includes the full song name, artist, release date, genre, lyrics, and mood. It also includes a sentiment analyzer for the lyrics of the song that works together with its genre to map a color to the song (current work in progress).
+This is a project that uses localhost to show information in real time about the current song playing on Spotify. This includes the full song name, artist, release date, genre, and full lyrics. It also includes both an emotion and sentiment analyzer for the lyrics that work together to map colors to match the mood of the song.
 
-This project will support communication over WiFi with an ESP8266 microcontroller for the purpose of broadcasting the colors of the current song to an LED strip.
+This project will support communication over WiFi with an ESP8266 microcontroller for the purpose of broadcasting the colors of the current song to an LED strip. Currently, the colors are only displayed on a web page along with the other information.
 
 ### Setting Up
 
