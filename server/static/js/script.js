@@ -8,21 +8,32 @@ var songData = new Vue({
         pop : '',
         lyrics : '',
         genre : '',
-        color : {
+        primaryColor : {
+            'r' : 236,
+            'g' : 240,
+            'b' : 241
+        },
+        secondaryColor : {
             'r' : 236,
             'g' : 240,
             'b' : 241
         }
     },
+    computed: {
+        createGradient() {
+            return `linear-gradient(45deg, rgba(${this.primaryColor.r}, ${this.primaryColor.g}, ${this.primaryColor.b}, 1) 0%, rgba(${this.secondaryColor.r}, ${this.secondaryColor.g}, ${this.secondaryColor.b}, 1) 100%)`;
+        }
+    },
     methods: {
-        changeSong: function (name, artist, date, cover, pop, genre, lyrics, color) {
+        changeSong: function (name, artist, date, cover, pop, genre, lyrics, primaryColor, secondaryColor) {
             this.name = name + ' - ' + artist;
             this.date = date;
             this.cover = cover;
             this.pop = pop;
             this.genre = genre;
             this.lyrics = (lyrics === '') ? 'Lyrics not found ...' : lyrics;
-            this.color = color;
+            this.primaryColor = primaryColor;
+            this.secondaryColor = secondaryColor;
         }
     }
 });
@@ -63,7 +74,8 @@ async function startTracking() {
 
         await $.ajax("/track").done(async function (data) {
             if (data['name'] !== '' & !abort) {
-                songData.changeSong(data.name, data.artist, data.date, data.cover, data.pop, data.genres[0], data.lyrics, data.color);
+                songData.changeSong(data.name, data.artist, data.date, data.cover, data.pop, data.genres[0], data.lyrics, data.primaryColor, data.secondaryColor);
+                console.log('received both' + data.primaryColor + data.secondaryColor)
                 showElements();
             }
         });

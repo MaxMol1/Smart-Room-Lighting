@@ -32,8 +32,9 @@ def getSongInformation(spotifyOptions, geniusOptions):
         'pop': '',
         'genres': [],
         'lyrics': '',
-        'emotion': '',
-        'color': ''
+        'emotions': (),
+        'primaryColor': '',
+        'secondaryColor': ''
     }
 
     # Fetch general information
@@ -98,8 +99,9 @@ def getSongInformation(spotifyOptions, geniusOptions):
         print (e)
 
     try:
-        songDetails['emotion'] = getSongEmotion(songDetails['lyrics'])
-        songDetails['color'] = getSongColor(songDetails['emotion'])
+        songDetails['emotions'] = getSongEmotion(songDetails['lyrics'])
+        songDetails['primaryColor'] = getSongColor(songDetails['emotions'][0])
+        songDetails['secondaryColor'] = getSongColor(songDetails['emotions'][1])
     except Exception as e:
         print (e)
 
