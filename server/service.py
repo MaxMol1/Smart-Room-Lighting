@@ -102,8 +102,11 @@ def getSongInformation(spotifyOptions, geniusOptions):
     try:
         songDetails['emotions'] = getSongEmotion(songDetails['lyrics'])
         songDetails['sentiment'] = getSongSentiment(songDetails['lyrics'])
+
+        print (songDetails['emotions'], songDetails['sentiment'])
+
         customColorMapping = {
-            ('P', 'Happy'): ({'r': 255, 'g': 255, 'b': 102}, {'r': 255, 'g': 187, 'b': 51}),
+            ('P', 'Happy'): ({'r': 255, 'g': 255, 'b': 50}, {'r': 255, 'g': 153, 'b': 102}),
             ('P', 'Angry'): ({'r': 255, 'g': 255, 'b': 102}, {'r': 255, 'g': 128, 'b': 128}),
             ('P', 'Surprise'): ({'r': 255, 'g': 204, 'b': 102}, {'r': 153, 'g': 255, 'b': 153}),
             ('P', 'Sad'): ({'r': 255, 'g': 255, 'b': 102}, {'r': 128, 'g': 170, 'b': 255}),
@@ -111,19 +114,20 @@ def getSongInformation(spotifyOptions, geniusOptions):
 
             ('N', 'Happy'): ({'r': 0, 'g': 153, 'b': 230}, {'r': 221, 'g': 153, 'b': 225}),
             ('N', 'Angry'): ({'r': 255, 'g': 51, 'b': 51}, {'r': 51, 'g': 26, 'b': 0}),
-            ('N', 'Surprise'): ({'r': 51, 'g': 153, 'b': 0}, {'r': 204, 'g': 0, 'b': 102}),
+            ('N', 'Surprise'): ({'r': 255, 'g': 230, 'b': 179}, {'r': 128, 'g': 255, 'b': 234}),
             ('N', 'Sad'): ({'r': 255, 'g': 179, 'b': 179}, {'r': 179, 'g': 242, 'b': 255}),
             ('N', 'Fear'): ({'r': 0, 'g': 179, 'b': 149}, {'r': 170, 'g': 0, 'b': 204}),
 
-            ('NU', 'Happy'): ({'r': 255, 'g': 212, 'b': 128}, {'r': 153, 'g': 221, 'b': 255}),
-            ('NU', 'Angry'): ({'r': 234, 'g': 128, 'b': 255}, {'r': 255, 'g': 102, 'b': 102}),
-            ('NU', 'Surprise'): ({'r': 128, 'g': 255, 'b': 149}, {'r': 213, 'g': 204, 'b': 255}),
-            ('NU', 'Sad'): ({'r': 255, 'g': 128, 'b': 255}, {'r': 153, 'g': 238, 'b': 255}),
-            ('NU', 'Fear'): ({'r': 255, 'g': 0, 'b': 0}, {'r': 255, 'g': 230, 'b': 238}),
+            ('NE', 'Happy'): ({'r': 255, 'g': 212, 'b': 128}, {'r': 153, 'g': 221, 'b': 255}),
+            ('NE', 'Angry'): ({'r': 234, 'g': 128, 'b': 255}, {'r': 255, 'g': 102, 'b': 102}),
+            ('NE', 'Surprise'): ({'r': 128, 'g': 255, 'b': 149}, {'r': 213, 'g': 204, 'b': 255}),
+            ('NE', 'Sad'): ({'r': 255, 'g': 128, 'b': 255}, {'r': 153, 'g': 238, 'b': 255}),
+            ('NE', 'Fear'): ({'r': 255, 'g': 0, 'b': 0}, {'r': 255, 'g': 230, 'b': 238}),
         }
         songDetails['colors'] = customColorMapping[(songDetails['sentiment'], songDetails['emotions'][0])]
 
     except Exception as e:
+        # TODO: set colors to a default if this try catch does not work
         print (e)
 
     return songDetails
