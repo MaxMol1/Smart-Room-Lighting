@@ -25,6 +25,10 @@ h3 {
     font-size: 16px;
 }
 
+p {
+    font-size: 14px;
+}
+
 .container-fluid {
     min-height: 100vh;
 }
