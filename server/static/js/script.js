@@ -8,12 +8,12 @@ var songData = new Vue({
         pop : '',
         lyrics : '',
         genre : '',
-        primaryColor : {
+        pColor : {
             'r' : 236,
             'g' : 240,
             'b' : 241
         },
-        secondaryColor : {
+        sColor : {
             'r' : 236,
             'g' : 240,
             'b' : 241
@@ -21,19 +21,19 @@ var songData = new Vue({
     },
     computed: {
         createGradient() {
-            return `linear-gradient(45deg, rgba(${this.primaryColor.r}, ${this.primaryColor.g}, ${this.primaryColor.b}, 1) 0%, rgba(${this.secondaryColor.r}, ${this.secondaryColor.g}, ${this.secondaryColor.b}, 1) 100%)`;
+            return `linear-gradient(45deg, rgba(${this.pColor.r}, ${this.pColor.g}, ${this.pColor.b}, 1) 0%, rgba(${this.sColor.r}, ${this.sColor.g}, ${this.sColor.b}, 1) 100%)`;
         }
     },
     methods: {
-        changeSong: function (name, artist, date, cover, pop, genre, lyrics, primaryColor, secondaryColor) {
+        changeSong: function (name, artist, date, cover, pop, genre, lyrics, pColor, sColor) {
             this.name = name + ' - ' + artist;
             this.date = date;
             this.cover = cover;
             this.pop = pop;
             this.genre = genre;
             this.lyrics = (lyrics === '') ? 'Lyrics not found ...' : lyrics;
-            this.primaryColor = primaryColor;
-            this.secondaryColor = secondaryColor;
+            this.pColor = pColor;
+            this.sColor = sColor;
         }
     }
 });
@@ -74,8 +74,7 @@ async function startTracking() {
 
         await $.ajax("/track").done(async function (data) {
             if (data['name'] !== '' & !abort) {
-                songData.changeSong(data.name, data.artist, data.date, data.cover, data.pop, data.genres[0], data.lyrics, data.primaryColor, data.secondaryColor);
-                console.log('received both' + data.primaryColor + data.secondaryColor)
+                songData.changeSong(data.name, data.artist, data.date, data.cover, data.pop, data.genres[0], data.lyrics, data.colors[0], data.colors[1]);
                 showElements();
             }
         });

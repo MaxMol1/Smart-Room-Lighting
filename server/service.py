@@ -2,7 +2,8 @@ import re
 from bs4 import BeautifulSoup
 from spotifyController import trackCurrentSong, trackCurrentSongGenres
 from geniusController import getGeniusArtistId, getArtistTopSongs, getGeniusSongUrlRes
-from models.emotionModel import getSongEmotion, getSongColor
+from models.emotionModel import getSongEmotion
+from models.sentimentModel import getSongSentiment
 
 def normalize(str):
     # remove remix from song name
@@ -33,8 +34,8 @@ def getSongInformation(spotifyOptions, geniusOptions):
         'genres': [],
         'lyrics': '',
         'emotions': (),
-        'primaryColor': '',
-        'secondaryColor': ''
+        'sentiment': '',
+        'colors': ()
     }
 
     # Fetch general information
@@ -100,8 +101,26 @@ def getSongInformation(spotifyOptions, geniusOptions):
 
     try:
         songDetails['emotions'] = getSongEmotion(songDetails['lyrics'])
-        songDetails['primaryColor'] = getSongColor(songDetails['emotions'][0])
-        songDetails['secondaryColor'] = getSongColor(songDetails['emotions'][1])
+        songDetails['sentiment'] = getSongSentiment(songDetails['lyrics'])
+        customColorMapping = {
+            ('P', 'Happy'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            {'P', 'Angry'}: ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            {'P', 'Surprise'}: ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            ('P', 'Sad'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            ('P', 'Fear'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            ('N', 'Happy'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            ('N', 'Angry'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            ('N', 'Surprise'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            ('N', 'Sad'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            ('N', 'Fear'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            ('NU', 'Happy'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            ('NU', 'Angry'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            ('NU', 'Surprise'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            ('NU', 'Sad'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+            ('NU', 'Fear'): ({'r': 255, 'g': 255, 'b': 128}, {'r': 255, 'g': 255, 'b': 128}),
+        }
+        songDetails['colors'] = customColorMapping[(songDetails['sentiment'], songDetails['emotions'][0])]
+
     except Exception as e:
         print (e)
 
