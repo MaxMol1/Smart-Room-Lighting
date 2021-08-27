@@ -35,7 +35,7 @@ def getSongInformation(spotifyOptions, geniusOptions):
         'lyrics': '',
         'emotions': (),
         'sentiment': '',
-        'colors': ()
+        'colors': ({'r' : 236, 'g' : 240, 'b' : 241}, {'r' : 236, 'g' : 240, 'b' : 241})
     }
 
     # Fetch general information
@@ -122,7 +122,7 @@ def getSongInformation(spotifyOptions, geniusOptions):
             ('NE', 'Angry'): ({'r': 234, 'g': 128, 'b': 255}, {'r': 255, 'g': 102, 'b': 102}),
             ('NE', 'Surprise'): ({'r': 128, 'g': 255, 'b': 149}, {'r': 213, 'g': 204, 'b': 255}),
             ('NE', 'Sad'): ({'r': 255, 'g': 128, 'b': 255}, {'r': 153, 'g': 238, 'b': 255}),
-            ('NE', 'Fear'): ({'r': 255, 'g': 0, 'b': 0}, {'r': 255, 'g': 230, 'b': 238}),
+            ('NE', 'Fear'): ({'r': 255, 'g': 153, 'b': 102}, {'r': 255, 'g': 230, 'b': 238}),
         }
         songDetails['colors'] = customColorMapping[(songDetails['sentiment'], songDetails['emotions'][0])]
 
