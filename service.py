@@ -53,24 +53,24 @@ def getSongInformation(spotifyOptions, geniusOptions):
 
     # Fetch general information
     try:
-        songRes = trackCurrentSong(headers=spotifyOptions)
-        songDetails['name'] = songRes['item']['name']
+        res = trackCurrentSong(headers=spotifyOptions)
+        songDetails['name'] = res['item']['name']
         try:
-            songDetails['date'] = datetime.datetime.strptime(songRes['item']['album']['release_date'], "%Y-%m-%d").date().strftime("%B %d, %Y")
+            songDetails['date'] = datetime.datetime.strptime(res['item']['album']['release_date'], "%Y-%m-%d").date().strftime("%B %d, %Y")
         except:
-            songDetails['date'] = songRes['item']['album']['release_date']
-        songDetails['artist'] = songRes['item']['artists'][0]['name']
-        songDetails['spotifyArtistId'] = songRes['item']['artists'][0]['id']
-        songDetails['cover'] = songRes['item']['album']['images'][0]['url']
-        songDetails['pop'] = songRes['item']['popularity']
+            songDetails['date'] = res['item']['album']['release_date']
+        songDetails['artist'] = res['item']['artists'][0]['name']
+        songDetails['spotifyArtistId'] = res['item']['artists'][0]['id']
+        songDetails['cover'] = res['item']['album']['images'][0]['url']
+        songDetails['pop'] = res['item']['popularity']
     except Exception as e:
         print (e)
         return
 
     # Fetch song genres
     try:
-        genresRes = trackCurrentSongGenres(artistId=songDetails['spotifyArtistId'], headers=spotifyOptions)
-        songDetails['genres'] = [string.capwords(x) for x in genresRes['genres']]
+        res = trackCurrentSongGenres(artistId=songDetails['spotifyArtistId'], headers=spotifyOptions)
+        songDetails['genres'] = [string.capwords(x) for x in res['genres']]
         if songDetails['genres'] == []:
             print ('... WARNING: no genres found for ' + songDetails['artist'])
     except Exception as e:

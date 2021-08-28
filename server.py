@@ -55,10 +55,12 @@ def callback():
 
   return redirect('/home')
 
+# Application home
 @app.route('/home')
 def home():
   return render_template('index.html')
 
+# Tracking endpoint
 @app.route('/track', methods=['GET', 'POST'])
 def track():
   songDetails = getSongInformation(spotifyOptions, geniusOptions)
