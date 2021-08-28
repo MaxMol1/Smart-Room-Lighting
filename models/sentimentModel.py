@@ -41,10 +41,10 @@ def getSongSentiment(lyrics):
 
     if abs(percent_positive - percent_negative) < 2:
         # neutral
-        return 'NE'
+        return 'Neutral'
     elif percent_positive > percent_negative:
         # positive songs
-        return 'P'
+        return 'Positive'
     else:
         # negative songs
-        return 'N'
+        return 'Negative'
