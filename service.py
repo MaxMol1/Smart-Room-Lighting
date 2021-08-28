@@ -24,7 +24,6 @@ def normalizeSong(name):
                 except:
                     raise Exception('FAILED to normalize ' + name)
 
-    # TODO: 5% TINT not being found (not in top 50)
     # keep only alphanumeric characters and remove feat/with features from song name
     name = re.sub(r'\(.*\)', '', name)
     name = re.sub(r'[^A-Za-z0-9]+', '', name).lower()
