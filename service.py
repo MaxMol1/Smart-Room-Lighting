@@ -1,16 +1,21 @@
 import re
 import string
+import datetime
 from bs4 import BeautifulSoup
 from spotifyController import trackCurrentSong, trackCurrentSongGenres
 from geniusController import getGeniusArtistId, getArtistTopSongs, getGeniusSongUrlRes
 from models.emotionModel import getSongEmotion
 from models.sentimentModel import getSongSentiment
 
-# TODO: normalize more extensively if needed
+# Normalize artist names
 def normalizeArtist(artist):
-    return artist.replace(' ', '-').lower()
+    artist = (artist.encode('ascii', 'ignore')).decode("utf-8")
+    return artist.replace(' ', '-').lower().strip()
 
+# Normalize sone names
 def normalizeSong(name):
+    name = (name.encode('ascii', 'ignore')).decode("utf-8")
+    
     # remove remix from song name
     if "remix" in name.lower():
         try:
@@ -50,7 +55,10 @@ def getSongInformation(spotifyOptions, geniusOptions):
     try:
         songRes = trackCurrentSong(headers=spotifyOptions)
         songDetails['name'] = songRes['item']['name']
-        songDetails['date'] = songRes['item']['album']['release_date']
+        try:
+            songDetails['date'] = datetime.datetime.strptime(songRes['item']['album']['release_date'], "%Y-%m-%d").date().strftime("%B %d, %Y")
+        except:
+            songDetails['date'] = songRes['item']['album']['release_date']
         songDetails['artist'] = songRes['item']['artists'][0]['name']
         songDetails['spotifyArtistId'] = songRes['item']['artists'][0]['id']
         songDetails['cover'] = songRes['item']['album']['images'][0]['url']
@@ -99,7 +107,7 @@ def getSongInformation(spotifyOptions, geniusOptions):
                 break
 
         if not songUrl:
-            raise Exception('FAILED to find ' + songDetails['name'] + ' (' + songNameNorm + ')' + ' for ' + songDetails['artist'] + ' on Genius')
+            raise Exception('FAILED to find ' + songDetails['name'] + ' for ' + songDetails['artist'] + ' on Genius')
 
         print ('... found song url: ' + songUrl)
 
