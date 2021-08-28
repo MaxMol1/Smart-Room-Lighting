@@ -3,22 +3,34 @@ import requests
 GENIUS_URL = 'https://api.genius.com'
 
 # Returns artist id using artist name
-def getGeniusArtistId(params, geniusOptions):
+def getGeniusArtistId(params, headers):
+    res = requests.get(GENIUS_URL + '/search/' , params=params, headers=headers)
+
     try:
-        return requests.get(GENIUS_URL + '/search/' , params=params, headers=geniusOptions).json()
-    except:
+        res.raise_for_status()
+    except requests.exceptions.HTTPError:
         raise Exception('FAILED to search Genius by artist name: ' + params['q'])
 
+    return res.json()
+
 # Returns an artists top songs
-def getArtistTopSongs(artistId, params, geniusOptions):
+def getArtistTopSongs(artistId, params, headers):
+    res = requests.get(GENIUS_URL + '/artists/' + str(artistId) + '/songs/', params=params, headers=headers)
+
     try:
-        return requests.get(GENIUS_URL + '/artists/' + str(artistId) + '/songs/', params=params, headers=geniusOptions).json()
-    except:
+        res.raise_for_status()
+    except requests.exceptions.HTTPError:
         raise Exception('FAILED to search Genius by artistId: ' + artistId)
 
+    return res.json()
+
 # Returns web response from a Genius song url
-def getGeniusSongUrlRes(songUrl):
+def getGeniusSongUrlRes(url):
+    res = requests.get(url)
+
     try:
-        return requests.get(songUrl)
-    except:
-        raise Exception('FAILED to search Genuis by song url: ' + songUrl)
+        res.raise_for_status()
+    except requests.exceptions.HTTPError:
+        raise Exception('FAILED to search Genuis by song url: ' + url)
+
+    return res

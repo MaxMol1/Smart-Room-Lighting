@@ -4,15 +4,23 @@ CURRENTLY_PLAYING_ENDPOINT = 'https://api.spotify.com/v1/me/player/currently-pla
 ARTIST_ENDPOINT = 'https://api.spotify.com/v1/artists/'
 
 # Returns currently playing song and info
-def trackCurrentSong(spotifyOptions):
+def trackCurrentSong(headers):
+    res = requests.get(CURRENTLY_PLAYING_ENDPOINT, headers=headers)
+
     try:
-        return requests.get(CURRENTLY_PLAYING_ENDPOINT, headers=spotifyOptions).json()
-    except:
+        res.raise_for_status()
+    except requests.exceptions.HTTPError:
         raise Exception('FAILED to track current playing song')
 
+    return res.json()
+
 # Returns genre of current playing song
-def trackCurrentSongGenres(artistId, spotifyOptions):
+def trackCurrentSongGenres(artistId, headers):
+    res = requests.get(ARTIST_ENDPOINT + artistId, headers=headers)
+
     try:
-        return requests.get(ARTIST_ENDPOINT + artistId, headers=spotifyOptions).json()
-    except:
+        res.raise_for_status()
+    except requests.exceptions.HTTPError:
         raise Exception('FAILED to fetch artist genres for artistId: ' + artistId)
+
+    return res.json()
