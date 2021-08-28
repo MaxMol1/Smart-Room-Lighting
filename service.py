@@ -6,21 +6,28 @@ from geniusController import getGeniusArtistId, getArtistTopSongs, getGeniusSong
 from models.emotionModel import getSongEmotion
 from models.sentimentModel import getSongSentiment
 
-def normalize(str):
+# TODO: normalize more extensively if needed
+def normalizeArtist(artist):
+    return artist.replace(' ', '-').lower()
+
+def normalizeSong(name):
     # remove remix from song name
-    if "remix" in str.lower():
+    if "remix" in name.lower():
         try:
-            str = str[:str.rindex('-')] # e.g. - [artist] remix
+            name = name[:name.rindex('-')] # e.g. - [artist] remix
         except:
             try:
-                str = str[:str.rindex('(')] # e.g. (remix)
+                name = name[:name.rindex('(')] # e.g. (remix)
             except:
-                raise Exception('FAILED to normalize' + str)
+                try:
+                    name = name[:name.rindex('REMIX')] # e.g. REMIX
+                except:
+                    raise Exception('FAILED to normalize ' + name)
 
     # keep only alphanumeric characters and remove feat/with features from song name
-    str = re.sub(r'\(.*\)', '', str)
-    str = re.sub(r'[^A-Za-z0-9]+', '', str).lower()
-    return str
+    name = re.sub(r'\(.*\)', '', name)
+    name = re.sub(r'[^A-Za-z0-9]+', '', name).lower()
+    return name
 
 # Service method to fetch all song details
 def getSongInformation(spotifyOptions, geniusOptions):
@@ -61,31 +68,38 @@ def getSongInformation(spotifyOptions, geniusOptions):
 
     # Fetch song lyrics
     try:
-        # Normalize song and artist names
-        songNameNorm = normalize(songDetails['name'])
-        artistNameNorm = normalize(songDetails['artist'])
+        # Normalize and artist and song names
+        artistNameNorm = normalizeArtist(songDetails['artist'])
+        songNameNorm = normalizeSong(songDetails['name'])
         
         # Get the Genius artist ID using artist name
         res = getGeniusArtistId(params={'q': artistNameNorm}, geniusOptions=geniusOptions)
         artistId = ''
         for hit in res['response']['hits']:
-            artistNorm = normalize(hit['result']['primary_artist']['name'])
+            artistNorm = normalizeArtist(hit['result']['primary_artist']['name'])
             if hit['type'] == 'song' and artistNorm == artistNameNorm:
                 artistId = hit['result']['primary_artist']['id']
                 break
         
+        if not artistId:
+            raise Exception('FAILED to find ' + songDetails['artist'] + ' on Genius')
+
+        print ('... found artistId: ' + str(artistId) + ' for artist ' + songDetails['artist'])
+
         # Get the correct Genius song url for the song name
         res = getArtistTopSongs(artistId=artistId, params={'id' : artistId, 'per_page' : '50', 'sort' : 'popularity'}, geniusOptions=geniusOptions)
         songUrl = ''
         for song in res['response']['songs']:
-            titleNorm = normalize(song['title'])
+            titleNorm = normalizeSong(song['title'])
 
             if titleNorm == songNameNorm:
                 songUrl = song['url']
                 break
 
         if not songUrl:
-            raise Exception('FAILED to find current playing song for artist on Genius')
+            raise Exception('FAILED to find ' + songDetails['name'] + ' for ' + songDetails['artist'] + ' on Genius')
+
+        print ('... found song url: ' + songUrl)
 
         # Fetch and parse Genius html from song url
         res = getGeniusSongUrlRes(songUrl=songUrl)
@@ -104,7 +118,7 @@ def getSongInformation(spotifyOptions, geniusOptions):
         songDetails['emotions'] = getSongEmotion(songDetails['lyrics'])
         songDetails['sentiment'] = getSongSentiment(songDetails['lyrics'])
 
-        print (songDetails['emotions'], songDetails['sentiment'])
+        print ('... identified song as ' + songDetails['emotions'][0] + ' ' + songDetails['sentiment'])
 
         customColorMapping = {
             ('P', 'Happy'): ({'r': 255, 'g': 255, 'b': 50}, {'r': 255, 'g': 153, 'b': 102}),
@@ -128,7 +142,6 @@ def getSongInformation(spotifyOptions, geniusOptions):
         songDetails['colors'] = customColorMapping[(songDetails['sentiment'], songDetails['emotions'][0])]
 
     except Exception as e:
-        # TODO: set colors to a default if this try catch does not work
         print (e)
 
     return songDetails
