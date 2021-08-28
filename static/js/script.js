@@ -6,8 +6,8 @@ var songData = new Vue({
         date : '',
         cover: '',
         pop : '',
-        lyrics : '',
         genre : '',
+        lyrics : '',
         pColor : {
             'r' : 236,
             'g' : 240,
@@ -73,7 +73,7 @@ async function startTracking() {
         console.log("fetching song ...");
 
         await $.ajax("/track").done(async function (data) {
-            if (data['name'] !== '' & !abort) {
+            if (data !== {} && data['name'] !== '' & !abort) {
                 songData.changeSong(data.name, data.artist, data.date, data.cover, data.pop, data.genres[0], data.lyrics, data.colors[0], data.colors[1]);
                 showElements();
             }

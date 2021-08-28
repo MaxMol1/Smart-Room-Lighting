@@ -7,6 +7,12 @@ from geniusController import getGeniusArtistId, getArtistTopSongs, getGeniusSong
 from models.emotionModel import getSongEmotion
 from models.sentimentModel import getSongSentiment
 
+global songCache
+songCache = {
+    'name': '',
+    'artist': ''
+}
+
 # Normalize artist names
 def normalizeArtist(artist):
     artist = (artist.encode('ascii', 'ignore')).decode("utf-8")
@@ -39,8 +45,8 @@ def getSongInformation(spotifyOptions, geniusOptions):
     # Object to store all song details
     songDetails = {
         'name': '',
-        'date': '',
         'artist': '',
+        'date': '',
         'spotifyArtistId': '',
         'cover': '',
         'pop': '',
@@ -55,14 +61,23 @@ def getSongInformation(spotifyOptions, geniusOptions):
     try:
         res = trackCurrentSong(headers=spotifyOptions)
         songDetails['name'] = res['item']['name']
+        songDetails['artist'] = res['item']['artists'][0]['name']
+
+        # Same song is playing
+        if songCache['name'] == songDetails['name'] and songCache['artist'] == songDetails['artist']:
+            return {}
+
         try:
             songDetails['date'] = datetime.datetime.strptime(res['item']['album']['release_date'], "%Y-%m-%d").date().strftime("%B %d, %Y")
         except:
             songDetails['date'] = res['item']['album']['release_date']
-        songDetails['artist'] = res['item']['artists'][0]['name']
         songDetails['spotifyArtistId'] = res['item']['artists'][0]['id']
         songDetails['cover'] = res['item']['album']['images'][0]['url']
         songDetails['pop'] = res['item']['popularity']
+
+        # set song cache
+        songCache['name'] = songDetails['name']
+        songCache['artist'] = songDetails['artist']
     except Exception as e:
         print (e)
         return
