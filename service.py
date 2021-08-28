@@ -47,9 +47,9 @@ def getSongInformation(spotifyOptions, geniusOptions):
         'name': '',
         'artist': '',
         'date': '',
-        'spotifyArtistId': '',
+        'spotifyArtistId': 0,
         'cover': '',
-        'pop': '',
+        'pop': 0,
         'genres': [],
         'lyrics': '',
         'emotions': (),
@@ -99,27 +99,36 @@ def getSongInformation(spotifyOptions, geniusOptions):
         
         # Get the Genius artist ID using artist name
         res = getGeniusArtistId(params={'q': artistNameNorm}, headers=geniusOptions)
-        geniusArtistId = ''
+        geniusArtistId = 0
         for hit in res['response']['hits']:
             artistNorm = normalizeArtist(hit['result']['primary_artist']['name'])
             if hit['type'] == 'song' and artistNorm == artistNameNorm:
                 geniusArtistId = hit['result']['primary_artist']['id']
                 break
         
-        if not geniusArtistId:
+        if geniusArtistId == 0:
             raise Exception('FAILED to find ' + songDetails['artist'] + ' on Genius')
 
         print ('... found Genius artistId: ' + str(geniusArtistId) + ' for artist ' + songDetails['artist'])
 
         # Get the correct Genius song url for the song name
-        res = getArtistTopSongs(artistId=geniusArtistId, params={'id' : geniusArtistId, 'per_page' : '50', 'sort' : 'popularity'}, headers=geniusOptions)
         songUrl = ''
-        for song in res['response']['songs']:
-            titleNorm = normalizeSong(song['title'])
-
-            if titleNorm == songNameNorm:
-                songUrl = song['url']
-                break
+        pageIndex = 1
+        while True:
+            print ('... searching results for ' + songDetails['name'] + ' on page ' + str(pageIndex))
+            res = getArtistTopSongs(artistId=geniusArtistId, params={'id': str(geniusArtistId), 'per_page': '50', 'sort': 'popularity', 'page': pageIndex}, headers=geniusOptions)
+            for song in res['response']['songs']:
+                titleNorm = normalizeSong(song['title'])
+                if titleNorm == songNameNorm:
+                    songUrl = song['url']
+                    break
+            else:
+                if not res['response']['next_page']:
+                    break
+                else:
+                    pageIndex += 1
+                    continue
+            break
 
         if not songUrl:
             raise Exception('FAILED to find ' + songDetails['name'] + ' for ' + songDetails['artist'] + ' on Genius')
