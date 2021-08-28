@@ -14,7 +14,7 @@ def getArtistTopSongs(artistId, params, headers):
     try:
         return requests.get(GENIUS_URL + '/artists/' + str(artistId) + '/songs/', params=params, headers=headers).json()
     except:
-        raise Exception('FAILED to search Genius by artistId: ' + artistId)
+        raise Exception('FAILED to search Genius by artistId: ' + str(artistId))
 
 # Returns web response from a Genius song url
 def getGeniusSongUrlRes(url):

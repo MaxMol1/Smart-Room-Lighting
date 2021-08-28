@@ -13,6 +13,6 @@ def trackCurrentSong(headers):
 # Returns genre of current playing song
 def trackCurrentSongGenres(artistId, headers):
     try:
-        return requests.get(ARTIST_ENDPOINT + artistId, headers=headers).json()
+        return requests.get(ARTIST_ENDPOINT + str(artistId), headers=headers).json()
     except:
-        raise Exception('FAILED to fetch artist genres for artistId: ' + artistId)
+        raise Exception('FAILED to fetch artist genres for artistId: ' + str(artistId))
