@@ -34,6 +34,9 @@ var songData = new Vue({
             this.lyrics = (lyrics === '') ? 'Lyrics not found ...' : lyrics;
             this.pColor = pColor;
             this.sColor = sColor;
+        },
+        hasData: function () {
+            return this.name != '';
         }
     }
 });
@@ -56,6 +59,10 @@ function hideElements() {
 }
 
 async function startTracking() {
+    if (songData.hasData()) {
+        showElements();
+    }
+
     abort = false
 
     // swap buttons
