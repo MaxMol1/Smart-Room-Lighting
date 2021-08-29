@@ -49,12 +49,14 @@ def callback():
   }
 
   # Obtain access and refresh tokens
-  SPOTIFY_ACCESS_TOKEN = requests.post(SPOTIFY_TOKEN_ENDPOINT, payload).json()['access_token']
-  # REFRESH_TOKEN = res['refresh_token']
-  # EXPIRES_IN = res['expires_in']
+  res = requests.post(SPOTIFY_TOKEN_ENDPOINT, payload).json()
+
+  SPOTIFY_ACCESS_TOKEN = res['access_token']
+  SPOTIFY_REFRESH_TOKEN = res['refresh_token']
   
   session['spotifyHeaders'] = { 'Authorization' : 'Bearer ' + SPOTIFY_ACCESS_TOKEN }
   session['geniusHeaders'] = { 'Authorization' : 'Bearer ' + GENIUS_ACCESS_TOKEN }
+  session['spotifyRefreshToken'] = SPOTIFY_REFRESH_TOKEN
 
   return redirect('/home')
 

@@ -153,6 +153,7 @@ class SongService:
         except Exception as e:
             print (e)
 
+        # Fetch song colors
         try:
             songDetails['emotions'] = self.emotionModel.getSongEmotion(songDetails['lyrics'])
             songDetails['sentiment'] = self.sentimentModel.getSongSentiment(songDetails['lyrics'])
