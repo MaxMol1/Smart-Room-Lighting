@@ -1,3 +1,4 @@
+from urllib.parse import quote
 import re
 import string
 import datetime
@@ -9,14 +10,67 @@ from models.sentimentModel import SentimentModel
 
 class SongService:
     def __init__(self):
+        # INPUT YOUR SPOTIFY CLIENT ID AND CLIENT SECRET HERE
+        self.SPOTIFY_CLIENT_ID = ''
+        self.SPOTIFY_CLIENT_SECRET = ''
+        self.SPOTIFY_REDIRECT_URI = 'http://127.0.0.1:3000/callback'
+        self.SPOTIFY_SCOPES = 'user-read-private user-read-currently-playing user-read-playback-state'
+
+        self.SPOTIFY_ACCESS_TOKEN = ''
+        self.SPOTIFY_REFRESH_TOKEN = ''
+        # INPUT YOUR GENIUS ACCESS TOKEN HERE
+        self.GENIUS_ACCESS_TOKEN = ''
+
         self.spotifyController = SpotifyController()
         self.geniusController = GeniusController()
         self.emotionModel = EmotionModel()
         self.sentimentModel = SentimentModel()
+
+        self.spotifyHeaders = { 'Authorization': '' }
+        self.geniusHeaders = { 'Authorization': '' }
+
         self.songCache = {
             'name': '',
             'artist': ''
         }
+
+    # TODO: check if access token is valid, use refresh token if needed
+    # Check if user is authenticated with Spotify
+    def isSpotifyUserAuthenticated(self):
+        return self.SPOTIFY_ACCESS_TOKEN != ''
+
+    # Authenticate Spotify user
+    def authenticateSpotifyUser(self):
+        url = ('?response_type=code&client_id=' + self.SPOTIFY_CLIENT_ID +
+            '&scope=' + quote(self.SPOTIFY_SCOPES) +
+            '&redirect_uri=' + quote(self.SPOTIFY_REDIRECT_URI))
+
+        return self.spotifyController.authRedirect(url=url)
+
+    # Generate access and refresh tokens for Spotify
+    def generateSpotifyTokens(self, code):
+        data = {
+            'grant_type': 'authorization_code',
+            'client_id': self.SPOTIFY_CLIENT_ID,
+            'client_secret': self.SPOTIFY_CLIENT_SECRET,
+            'code': code,
+            'redirect_uri': self.SPOTIFY_REDIRECT_URI,
+        }
+
+        try:
+            res = self.spotifyController.generateTokens(data=data)
+        except Exception as e:
+            print (e)
+            return
+
+        self.SPOTIFY_ACCESS_TOKEN = res['access_token']
+        self.SPOTIFY_REFRESH_TOKEN = res['refresh_token']
+        self.generateSpotifyGeniusHeaders()
+
+    # Generate Spotify and Genius headers used for API calls
+    def generateSpotifyGeniusHeaders(self):
+        self.spotifyHeaders['Authorization'] = 'Bearer ' + self.SPOTIFY_ACCESS_TOKEN
+        self.geniusHeaders['Authorization'] = 'Bearer ' + self.GENIUS_ACCESS_TOKEN
 
     # Normalize artist names
     def normalizeArtist(self, artist):
@@ -46,7 +100,7 @@ class SongService:
         return name
 
     # Service method to fetch all song details
-    def getSongInformation(self, spotifyHeaders, geniusHeaders):
+    def getSongInformation(self):
         # Object to store all song details
         songDetails = {
             'name': '',
@@ -64,7 +118,7 @@ class SongService:
 
         # Fetch general information
         try:
-            res = self.spotifyController.trackCurrentSong(headers=spotifyHeaders)
+            res = self.spotifyController.trackCurrentSong(headers=self.spotifyHeaders)
             songDetails['name'] = res['item']['name']
             songDetails['artist'] = res['item']['artists'][0]['name']
 
@@ -89,7 +143,7 @@ class SongService:
 
         # Fetch song genres
         try:
-            res = self.spotifyController.trackCurrentSongGenres(artistId=songDetails['spotifyArtistId'], headers=spotifyHeaders)
+            res = self.spotifyController.trackCurrentSongGenres(artistId=songDetails['spotifyArtistId'], headers=self.spotifyHeaders)
             songDetails['genres'] = [string.capwords(x) for x in res['genres']]
             if songDetails['genres'] == []:
                 print ('... WARNING: no genres found for ' + songDetails['artist'])
@@ -103,7 +157,7 @@ class SongService:
             songNameNorm = self.normalizeSong(songDetails['name'])
             
             # Get the Genius artist ID using artist name
-            res = self.geniusController.getGeniusArtistId(params={'q': artistNameNorm}, headers=geniusHeaders)
+            res = self.geniusController.getGeniusArtistId(params={'q': artistNameNorm}, headers=self.geniusHeaders)
             geniusArtistId = 0
             for hit in res['response']['hits']:
                 artistNorm = self.normalizeArtist(hit['result']['primary_artist']['name'])
@@ -121,7 +175,7 @@ class SongService:
             pageIndex = 1
             while True:
                 print ('... searching results for ' + songDetails['name'] + ' on page ' + str(pageIndex))
-                res = self.geniusController.getArtistTopSongs(artistId=geniusArtistId, params={'id': str(geniusArtistId), 'per_page': '50', 'sort': 'popularity', 'page': pageIndex}, headers=geniusHeaders)
+                res = self.geniusController.getArtistTopSongs(artistId=geniusArtistId, params={'id': str(geniusArtistId), 'per_page': '50', 'sort': 'popularity', 'page': pageIndex}, headers=self.geniusHeaders)
                 for song in res['response']['songs']:
                     titleNorm = self.normalizeSong(song['title'])
                     if titleNorm == songNameNorm:
