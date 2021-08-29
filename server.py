@@ -1,5 +1,5 @@
 from flask import Flask, request, redirect, render_template, jsonify
-from service import SongService
+from songService import SongService
 
 # Create custom Flask to be able to use Vue syntax
 class CustomFlask(Flask):
