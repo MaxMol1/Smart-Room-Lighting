@@ -7,9 +7,11 @@ class SpotifyController:
         self.CURRENTLY_PLAYING_ENDPOINT = 'https://api.spotify.com/v1/me/player/currently-playing'
         self.ARTIST_ENDPOINT = 'https://api.spotify.com/v1/artists/'
 
+    # Returns correct endpoint for authentication
     def authRedirect(self, url):
         return self.AUTH_ENDPOINT + url
 
+    # Returns response from token endpoint
     def generateTokens(self, data):
         try:
             return requests.post(self.TOKEN_ENDPOINT, data=data).json()
