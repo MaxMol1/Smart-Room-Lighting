@@ -2,7 +2,7 @@ from flask import Flask, request, session, redirect, render_template, jsonify
 import requests
 import secrets
 from urllib.parse import quote
-from service import getSongInformation
+from service import SongService
 
 # INPUT YOUR SPOTIFY CLIENT ID AND CLIENT SECRET HERE
 SPOTIFY_CLIENT_ID = ''
@@ -24,6 +24,8 @@ class CustomFlask(Flask):
 
 app = CustomFlask(__name__)
 app.secret_key = secrets.token_urlsafe(16)
+
+songService = SongService()
 
 # Auth endpoint
 @app.route('/')
@@ -51,8 +53,8 @@ def callback():
   # REFRESH_TOKEN = res['refresh_token']
   # EXPIRES_IN = res['expires_in']
   
-  session['SPOTIFY_ACCESS_TOKEN'] = SPOTIFY_ACCESS_TOKEN
-  session['GENIUS_ACCESS_TOKEN'] = GENIUS_ACCESS_TOKEN
+  session['spotifyHeaders'] = { 'Authorization' : 'Bearer ' + SPOTIFY_ACCESS_TOKEN }
+  session['geniusHeaders'] = { 'Authorization' : 'Bearer ' + GENIUS_ACCESS_TOKEN }
 
   return redirect('/home')
 
@@ -64,9 +66,7 @@ def home():
 # Tracking endpoint
 @app.route('/track', methods=['GET', 'POST'])
 def track():
-  spotifyHeaders = { 'Authorization' : 'Bearer ' + session.get('SPOTIFY_ACCESS_TOKEN', None) }
-  geniusHeaders = { 'Authorization' : 'Bearer ' + session.get('GENIUS_ACCESS_TOKEN', None) }
-  songDetails = getSongInformation(spotifyHeaders=spotifyHeaders, geniusHeaders=geniusHeaders)
+  songDetails = songService.getSongInformation(spotifyHeaders=session.get('spotifyHeaders', None), geniusHeaders=session.get('geniusHeaders', None))
   return jsonify(songDetails)
 
 if __name__ == "__main__":
