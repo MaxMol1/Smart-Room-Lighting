@@ -27,17 +27,21 @@ app.secret_key = secrets.token_urlsafe(16)
 
 songService = SongService()
 
-# Auth endpoint
+# Entry endpoint
 @app.route('/')
 def index():
-  authUrl = (SPOTIFY_AUTH_ENDPOINT +
-  '?response_type=code&client_id=' + SPOTIFY_CLIENT_ID +
-  '&scope=' + quote(SPOTIFY_SCOPES) +
-  '&redirect_uri=' + quote(REDIRECT_URI))
-  
-  return redirect(authUrl)
+  if session.get('spotifyHeaders', None) is not None and session.get('geniusHeaders', None) is not None:
+    # user is authenticated
+    return render_template('index.html')
+  else:
+    # authenticate user
+    authUrl = (SPOTIFY_AUTH_ENDPOINT +
+      '?response_type=code&client_id=' + SPOTIFY_CLIENT_ID +
+      '&scope=' + quote(SPOTIFY_SCOPES) +
+      '&redirect_uri=' + quote(REDIRECT_URI))
+    return redirect(authUrl)
 
-# Callback endpoint
+# Callback auth endpoint
 @app.route('/callback')
 def callback():
   payload = {
@@ -58,15 +62,11 @@ def callback():
   session['geniusHeaders'] = { 'Authorization' : 'Bearer ' + GENIUS_ACCESS_TOKEN }
   session['spotifyRefreshToken'] = SPOTIFY_REFRESH_TOKEN
 
-  return redirect('/home')
+  return redirect('/')
 
-# Application home
-@app.route('/home')
-def home():
-  return render_template('index.html')
 
 # Tracking endpoint
-@app.route('/track', methods=['GET', 'POST'])
+@app.route('/track', methods=['GET'])
 def track():
   songDetails = songService.getSongInformation(spotifyHeaders=session.get('spotifyHeaders', None), geniusHeaders=session.get('geniusHeaders', None))
   return jsonify(songDetails)
