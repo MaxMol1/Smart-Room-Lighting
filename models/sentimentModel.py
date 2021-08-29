@@ -5,7 +5,7 @@ import string
 
 class SentimentModel:
     # Returns sentiment of song lyrics - Positive, Neutral, or Negative
-    def getSongSentiment(lyrics):
+    def getSongSentiment(self, lyrics):
         sid = SentimentIntensityAnalyzer()
         tokenizer = RegexpTokenizer(r'\w+')
         # TODO: consider stopword removal
