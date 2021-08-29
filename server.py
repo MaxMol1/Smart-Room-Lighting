@@ -1,5 +1,6 @@
-from flask import Flask, request, redirect, render_template, jsonify
+from flask import Flask, request, session, redirect, render_template, jsonify
 import requests
+import secrets
 from urllib.parse import quote
 from service import getSongInformation
 
@@ -22,6 +23,7 @@ class CustomFlask(Flask):
   ))
 
 app = CustomFlask(__name__)
+app.secret_key = secrets.token_urlsafe(16)
 
 # Auth endpoint
 @app.route('/')
@@ -49,9 +51,8 @@ def callback():
   # REFRESH_TOKEN = res['refresh_token']
   # EXPIRES_IN = res['expires_in']
   
-  global spotifyOptions, geniusOptions
-  spotifyOptions = { 'Authorization' : 'Bearer ' + SPOTIFY_ACCESS_TOKEN }
-  geniusOptions = { 'Authorization' : 'Bearer ' + GENIUS_ACCESS_TOKEN }
+  session['SPOTIFY_ACCESS_TOKEN'] = SPOTIFY_ACCESS_TOKEN
+  session['GENIUS_ACCESS_TOKEN'] = GENIUS_ACCESS_TOKEN
 
   return redirect('/home')
 
@@ -63,7 +64,9 @@ def home():
 # Tracking endpoint
 @app.route('/track', methods=['GET', 'POST'])
 def track():
-  songDetails = getSongInformation(spotifyOptions, geniusOptions)
+  spotifyHeaders = { 'Authorization' : 'Bearer ' + session.get('SPOTIFY_ACCESS_TOKEN', None) }
+  geniusHeaders = { 'Authorization' : 'Bearer ' + session.get('GENIUS_ACCESS_TOKEN', None) }
+  songDetails = getSongInformation(spotifyHeaders=spotifyHeaders, geniusHeaders=geniusHeaders)
   return jsonify(songDetails)
 
 if __name__ == "__main__":

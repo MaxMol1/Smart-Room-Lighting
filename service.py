@@ -41,7 +41,7 @@ def normalizeSong(name):
     return name
 
 # Service method to fetch all song details
-def getSongInformation(spotifyOptions, geniusOptions):
+def getSongInformation(spotifyHeaders, geniusHeaders):
     # Object to store all song details
     songDetails = {
         'name': '',
@@ -59,7 +59,7 @@ def getSongInformation(spotifyOptions, geniusOptions):
 
     # Fetch general information
     try:
-        res = trackCurrentSong(headers=spotifyOptions)
+        res = trackCurrentSong(headers=spotifyHeaders)
         songDetails['name'] = res['item']['name']
         songDetails['artist'] = res['item']['artists'][0]['name']
 
@@ -84,7 +84,7 @@ def getSongInformation(spotifyOptions, geniusOptions):
 
     # Fetch song genres
     try:
-        res = trackCurrentSongGenres(artistId=songDetails['spotifyArtistId'], headers=spotifyOptions)
+        res = trackCurrentSongGenres(artistId=songDetails['spotifyArtistId'], headers=spotifyHeaders)
         songDetails['genres'] = [string.capwords(x) for x in res['genres']]
         if songDetails['genres'] == []:
             print ('... WARNING: no genres found for ' + songDetails['artist'])
@@ -98,7 +98,7 @@ def getSongInformation(spotifyOptions, geniusOptions):
         songNameNorm = normalizeSong(songDetails['name'])
         
         # Get the Genius artist ID using artist name
-        res = getGeniusArtistId(params={'q': artistNameNorm}, headers=geniusOptions)
+        res = getGeniusArtistId(params={'q': artistNameNorm}, headers=geniusHeaders)
         geniusArtistId = 0
         for hit in res['response']['hits']:
             artistNorm = normalizeArtist(hit['result']['primary_artist']['name'])
@@ -116,7 +116,7 @@ def getSongInformation(spotifyOptions, geniusOptions):
         pageIndex = 1
         while True:
             print ('... searching results for ' + songDetails['name'] + ' on page ' + str(pageIndex))
-            res = getArtistTopSongs(artistId=geniusArtistId, params={'id': str(geniusArtistId), 'per_page': '50', 'sort': 'popularity', 'page': pageIndex}, headers=geniusOptions)
+            res = getArtistTopSongs(artistId=geniusArtistId, params={'id': str(geniusArtistId), 'per_page': '50', 'sort': 'popularity', 'page': pageIndex}, headers=geniusHeaders)
             for song in res['response']['songs']:
                 titleNorm = normalizeSong(song['title'])
                 if titleNorm == songNameNorm:
