@@ -34,7 +34,6 @@ class SongService:
             'artist': ''
         }
 
-    # TODO: check if access token is valid, use refresh token if needed
     # Check if user is authenticated with Spotify
     def isSpotifyUserAuthenticated(self):
         return self.SPOTIFY_ACCESS_TOKEN != ''
@@ -72,32 +71,23 @@ class SongService:
         self.spotifyHeaders['Authorization'] = 'Bearer ' + self.SPOTIFY_ACCESS_TOKEN
         self.geniusHeaders['Authorization'] = 'Bearer ' + self.GENIUS_ACCESS_TOKEN
 
-    # Normalize artist names
-    def normalizeArtist(self, artist):
-        artist = (artist.encode('ascii', 'ignore')).decode("utf-8")
-        return artist.replace(' ', '-').lower().strip()
-
     # Normalize sone names
     def normalizeSong(self, name):
-        name = (name.encode('ascii', 'ignore')).decode("utf-8")
+        name = (name.encode('ascii', 'ignore')).decode("utf-8").lower()
+        name = re.sub("[\(\[].*?[\)\]]", "", name)
         
-        # remove remix from song name
-        if "remix" in name.lower():
-            try:
-                name = name[:name.rindex('-')] # e.g. - [artist] remix
-            except:
-                try:
-                    name = name[:name.rindex('(')] # e.g. (remix)
-                except:
-                    try:
-                        name = name[:name.rindex('REMIX')] # e.g. REMIX
-                    except:
-                        raise Exception('FAILED to normalize ' + name)
+        if ' - ' in name:
+            name = name[:name.rindex(' - ')]
+        if ' remix' in name:
+            name = name[:name.rindex(' remix')]
 
-        # keep only alphanumeric characters and remove feat/with features from song name
-        name = re.sub(r'\(.*\)', '', name)
-        name = re.sub(r'[^A-Za-z0-9]+', '', name).lower()
-        return name
+        return name.strip()
+
+    # Normalize artist names
+    def normalizeArtist(self, artist):
+        artist = (artist.encode('ascii', 'ignore')).decode("utf-8").lower()
+
+        return artist.replace(' ', '-').strip()
 
     # Service method to fetch all song details
     def getSongInformation(self):
@@ -153,44 +143,67 @@ class SongService:
         # Fetch song lyrics
         try:
             # Normalize and artist and song names
-            artistNameNorm = self.normalizeArtist(songDetails['artist'])
             songNameNorm = self.normalizeSong(songDetails['name'])
-            
-            # Get the Genius artist ID using artist name
-            res = self.geniusController.getGeniusArtistId(params={'q': artistNameNorm}, headers=self.geniusHeaders)
+            artistNameNorm = self.normalizeArtist(songDetails['artist'])
+            songUrl = ''
             geniusArtistId = 0
+
+            # Search Genius using song name
+            print ('... Searching Genius for ' + songDetails['name'])
+            res = self.geniusController.getGeniusSearchRes(params={'q': songNameNorm}, headers=self.geniusHeaders)
             for hit in res['response']['hits']:
+                songNorm = self.normalizeSong(hit['result']['title'])
                 artistNorm = self.normalizeArtist(hit['result']['primary_artist']['name'])
+
                 if hit['type'] == 'song' and artistNorm == artistNameNorm:
                     geniusArtistId = hit['result']['primary_artist']['id']
-                    break
-            
-            if geniusArtistId == 0:
-                raise Exception('FAILED to find ' + songDetails['artist'] + ' on Genius')
-
-            print ('... found Genius artistId: ' + str(geniusArtistId) + ' for artist ' + songDetails['artist'])
-
-            # Get the correct Genius song url for the song name
-            songUrl = ''
-            pageIndex = 1
-            while True:
-                print ('... searching results for ' + songDetails['name'] + ' on page ' + str(pageIndex))
-                res = self.geniusController.getArtistTopSongs(artistId=geniusArtistId, params={'id': str(geniusArtistId), 'per_page': '50', 'sort': 'popularity', 'page': pageIndex}, headers=self.geniusHeaders)
-                for song in res['response']['songs']:
-                    titleNorm = self.normalizeSong(song['title'])
-                    if titleNorm == songNameNorm:
-                        songUrl = song['url']
+                    if songNorm == songNameNorm:
+                        songUrl = hit['result']['url']
                         break
-                else:
-                    if not res['response']['next_page']:
-                        break
-                    else:
-                        pageIndex += 1
-                        continue
-                break
 
+            # Search by song did not yield correct artist
+            if not geniusArtistId:
+                print ('... Search by song unsuccessful. Searching Genius for ' + songDetails['artist'])
+                # Search Genius using artist name
+                res = self.geniusController.getGeniusSearchRes(params={'q': artistNameNorm}, headers=self.geniusHeaders)
+                for hit in res['response']['hits']:
+                    songNorm = self.normalizeSong(hit['result']['title'])
+                    artistNorm = self.normalizeArtist(hit['result']['primary_artist']['name'])
+
+                    if hit['type'] == 'song' and artistNorm == artistNameNorm:
+                        geniusArtistId = hit['result']['primary_artist']['id']
+                        if songNorm == songNameNorm:
+                            songUrl = hit['result']['url']
+                            break
+
+                # Artist not found on Genius
+                if geniusArtistId == 0:
+                    raise Exception('FAILED to find ' + songDetails['artist'] + ' on Genius')
+
+                print ('... found Genius artistId: ' + str(geniusArtistId) + ' for artist ' + songDetails['artist'])
+
+            # Search by song or artist did not yield a proper result
             if not songUrl:
-                raise Exception('FAILED to find ' + songDetails['name'] + ' for ' + songDetails['artist'] + ' on Genius')
+                # Get the correct Genius song url for the song name
+                pageIndex = 1
+                while True:
+                    print ('... searching results for ' + songDetails['name'] + ' on page ' + str(pageIndex))
+                    res = self.geniusController.getGeniusArtistSongs(artistId=geniusArtistId, params={'id': str(geniusArtistId), 'per_page': '50', 'sort': 'popularity', 'page': pageIndex}, headers=self.geniusHeaders)
+                    for song in res['response']['songs']:
+                        songNorm = self.normalizeSong(song['title'])
+                        if songNorm == songNameNorm:
+                            songUrl = song['url']
+                            break
+                    else:
+                        if not res['response']['next_page']:
+                            break
+                        else:
+                            pageIndex += 1
+                            continue
+                    break
+
+                if not songUrl:
+                    raise Exception('FAILED to find ' + songDetails['name'] + ' for ' + songDetails['artist'] + ' on Genius')
 
             print ('... found song url: ' + songUrl)
 

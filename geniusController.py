@@ -5,14 +5,14 @@ class GeniusController:
         self.GENIUS_URL = 'https://api.genius.com'
 
     # Returns artist id using artist name
-    def getGeniusArtistId(self, params, headers):
+    def getGeniusSearchRes(self, params, headers):
         try:
             return requests.get(self.GENIUS_URL + '/search/' , params=params, headers=headers).json()
         except:
-            raise Exception('FAILED to search Genius by artist name: ' + params['q'])
+            raise Exception('FAILED to search Genius for: ' + params['q'])
 
     # Returns an artists top songs
-    def getArtistTopSongs(self, artistId, params, headers):
+    def getGeniusArtistSongs(self, artistId, params, headers):
         try:
             return requests.get(self.GENIUS_URL + '/artists/' + str(artistId) + '/songs/', params=params, headers=headers).json()
         except:
