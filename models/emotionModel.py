@@ -4,7 +4,7 @@ import re
 class EmotionModel:
     # Returns top two emotions from song lyrics
     def getSongEmotion(self, lyrics):
-        if lyrics == '':
+        if lyrics == '' or lyrics == 'This is an instrumental!':
             raise Exception('FAILED to receive lyrics')
 
         # process lyrics

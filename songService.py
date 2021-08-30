@@ -182,6 +182,9 @@ class SongService:
             lyricsSegment = lyricsContainer.get_text().split(delimiter)
             songDetails['lyrics'] += "\n".join(line for line in lyricsSegment)
 
+        if songDetails['lyrics'] == '':
+            songDetails['lyrics'] = 'This is an instrumental!'
+
         return songDetails
 
     # Get song emotions, sentiment, and colors
