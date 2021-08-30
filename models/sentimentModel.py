@@ -37,6 +37,10 @@ class SentimentModel:
             else:
                 negative += 1
 
+        # if song has very little lyrics
+        if not negative + positive + neutral:
+            return 'Neutral'
+
         percent_positive = (positive/float(negative + positive + neutral))*100
         percent_negative = (negative/float(negative + positive + neutral))*100
 
