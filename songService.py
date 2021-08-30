@@ -3,6 +3,7 @@ import re
 import string
 import datetime
 from bs4 import BeautifulSoup
+from requests.models import HTTPError
 from spotifyController import SpotifyController
 from geniusController import GeniusController
 from models.emotionModel import EmotionModel
@@ -49,6 +50,20 @@ class SongService:
         except Exception as e:
             print (e)
             return { 'access_token': '', 'refresh_token': '' }
+
+    def reGenerateSpotifyTokens(self, refresh_token):
+        data = {
+            'grant_type': 'refresh_token',
+            'refresh_token': refresh_token,
+            'client_id': self.SPOTIFY_CLIENT_ID,
+            'client_secret': self.SPOTIFY_CLIENT_SECRET
+        }
+
+        try:
+            return self.spotifyController.generateTokens(data=data)
+        except Exception as e:
+            print (e)
+            return { 'access_token': '' }
 
     # Get general song info
     def getGeneralInfo(self, songDetails, spotifyHeaders):
@@ -238,6 +253,9 @@ class SongService:
         # Fetch general information
         try:
             songDetails = self.getGeneralInfo(songDetails=songDetails, spotifyHeaders=spotifyHeaders)
+        except HTTPError as e:
+            print (e)
+            raise
         except Exception as e:
             print (e)
             return {}

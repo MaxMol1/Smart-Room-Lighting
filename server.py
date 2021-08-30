@@ -26,7 +26,7 @@ def index():
 # Callback auth endpoint
 @app.route('/callback')
 def callback():
-  res = songService.generateSpotifyTokens(str(request.args['code']))
+  res = songService.generateSpotifyTokens(code=str(request.args['code']))
   session['SPOTIFY_ACCESS_TOKEN'] = res['access_token']
   session['SPOTIFY_REFRESH_TOKEN'] = res['refresh_token']
   session['GENIUS_ACCESS_TOKEN'] = ''
@@ -35,10 +35,15 @@ def callback():
 # Tracking endpoint
 @app.route('/track', methods=['GET'])
 def track():
-  return jsonify(songService.getSongInformation(
-    spotifyHeaders={ 'Authorization': 'Bearer ' + session.get('SPOTIFY_ACCESS_TOKEN', None) },
-    geniusHeaders={ 'Authorization': 'Bearer ' + session.get('GENIUS_ACCESS_TOKEN', None) }
-  ))
+  try:
+    return jsonify(songService.getSongInformation(
+      spotifyHeaders={ 'Authorization': 'Bearer ' + session.get('SPOTIFY_ACCESS_TOKEN', None) },
+      geniusHeaders={ 'Authorization': 'Bearer ' + session.get('GENIUS_ACCESS_TOKEN', None) }
+    ))
+  except:
+    res = songService.reGenerateSpotifyTokens(refresh_token=session['SPOTIFY_REFRESH_TOKEN'])
+    session['SPOTIFY_ACCESS_TOKEN'] = res['access_token']
+    return redirect('/track')
 
 if __name__ == "__main__":
   app.run(port=3000)

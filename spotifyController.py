@@ -1,4 +1,5 @@
 import requests
+from requests.models import HTTPError
 
 class SpotifyController:
     def __init__(self):
@@ -21,9 +22,15 @@ class SpotifyController:
     # Returns currently playing song and info
     def trackCurrentSong(self, headers):
         try:
-            return requests.get(self.CURRENTLY_PLAYING_ENDPOINT, headers=headers).json()
+            res = requests.get(self.CURRENTLY_PLAYING_ENDPOINT, headers=headers)
+            resJSON = res.json()
         except:
             raise Exception('FAILED to track current playing song')
+
+        if res.status_code == 401:
+            raise HTTPError('FAILED to authenticate with Spotify')
+        else:
+            return resJSON
 
     # Returns genre of current playing song
     def trackCurrentSongGenres(self, artistId, headers):
