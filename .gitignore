@@ -9,5 +9,5 @@
 # =========================
 
 *pyc
-server.env
+.env
 todo.md
