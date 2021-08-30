@@ -35,6 +35,8 @@ def callback():
 # Tracking endpoint
 @app.route('/track', methods=['GET'])
 def track():
+  if not session.get('SPOTIFY_ACCESS_TOKEN', None):
+    return redirect(songService.authenticateSpotifyUser())
   try:
     return jsonify(songService.getSongInformation(
       spotifyHeaders={ 'Authorization': 'Bearer ' + session.get('SPOTIFY_ACCESS_TOKEN', None) },
