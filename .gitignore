@@ -1,0 +1,13 @@
+# =========================
+# Operating System Files
+# =========================
+
+.DS_Store
+
+# =========================
+# Project resources
+# =========================
+
+*pyc
+server.env
+todo.md
