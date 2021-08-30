@@ -31,7 +31,7 @@ var songData = new Vue({
             this.cover = cover;
             this.pop = pop;
             this.genre = genre;
-            this.lyrics = (lyrics === '') ? 'Lyrics not found ...' : lyrics;
+            this.lyrics = (lyrics === '') ? 'Lyrics not found, check logs ...' : lyrics;
             this.pColor = pColor;
             this.sColor = sColor;
         },
