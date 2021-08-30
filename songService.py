@@ -1,4 +1,5 @@
 from urllib.parse import quote
+import os
 import re
 import string
 import datetime
@@ -12,8 +13,8 @@ from models.sentimentModel import SentimentModel
 class SongService:
     def __init__(self):
         # INPUT YOUR SPOTIFY CLIENT ID AND CLIENT SECRET HERE
-        self.SPOTIFY_CLIENT_ID = ''
-        self.SPOTIFY_CLIENT_SECRET = ''
+        self.SPOTIFY_CLIENT_ID = os.environ['SPOTIFY_ACCESS_TOKEN']
+        self.SPOTIFY_CLIENT_SECRET = os.environ['SPOTIFY_REFRESH_TOKEN']
         self.SPOTIFY_REDIRECT_URI = 'http://127.0.0.1:3000/callback'
         self.SPOTIFY_SCOPES = 'user-read-private user-read-currently-playing user-read-playback-state'
 

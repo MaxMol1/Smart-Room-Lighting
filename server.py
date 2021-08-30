@@ -1,5 +1,6 @@
 from flask import Flask, request, session, redirect, render_template, jsonify
 import secrets
+import os
 from songService import SongService
 
 # Create custom Flask to be able to use Vue syntax
@@ -29,7 +30,7 @@ def callback():
   res = songService.generateSpotifyTokens(code=str(request.args['code']))
   session['SPOTIFY_ACCESS_TOKEN'] = res['access_token']
   session['SPOTIFY_REFRESH_TOKEN'] = res['refresh_token']
-  session['GENIUS_ACCESS_TOKEN'] = ''
+  session['GENIUS_ACCESS_TOKEN'] = os.environ['GENIUS_ACCESS_TOKEN']
   return redirect('/')
 
 # Tracking endpoint
