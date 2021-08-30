@@ -77,10 +77,11 @@ async function startTracking() {
             break;
         }
 
-        console.log("fetching song ...");
+        console.log("... fetching song");
 
         await $.ajax("/track").done(async function (data) {
-            if (data !== {} && data['name'] !== '' & !abort) {
+            if (!jQuery.isEmptyObject(data) && !abort) {
+                console.log("... received song");
                 songData.changeSong(data.name, data.artist, data.date, data.cover, data.pop, data.genres[0], data.lyrics, data.colors[0], data.colors[1]);
                 showElements();
             }
