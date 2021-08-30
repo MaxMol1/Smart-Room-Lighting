@@ -79,3 +79,9 @@ img {
         margin: 0 auto;
     }
 }
+
+@media only screen and (min-width: 1500px) {
+    .container {
+        max-width: 1600px;
+    }
+}
