@@ -1,4 +1,5 @@
-from flask import Flask, request, redirect, render_template, jsonify
+from flask import Flask, request, session, redirect, render_template, jsonify
+import secrets
 from songService import SongService
 
 # Create custom Flask to be able to use Vue syntax
@@ -11,12 +12,13 @@ class CustomFlask(Flask):
 
 # Create app and song service
 app = CustomFlask(__name__)
+app.secret_key = secrets.token_urlsafe(16)
 songService = SongService()
 
 # Entry endpoint
 @app.route('/')
 def index():
-  if not songService.isSpotifyUserAuthenticated():
+  if not session.get('SPOTIFY_ACCESS_TOKEN', None):
     return redirect(songService.authenticateSpotifyUser())
   else:
     return render_template('index.html')
@@ -24,14 +26,19 @@ def index():
 # Callback auth endpoint
 @app.route('/callback')
 def callback():
-  songService.generateSpotifyTokens(str(request.args['code']))
+  res = songService.generateSpotifyTokens(str(request.args['code']))
+  session['SPOTIFY_ACCESS_TOKEN'] = res['access_token']
+  session['SPOTIFY_REFRESH_TOKEN'] = res['refresh_token']
+  session['GENIUS_ACCESS_TOKEN'] = ''
   return redirect('/')
 
 # Tracking endpoint
 @app.route('/track', methods=['GET'])
 def track():
-  songDetails = songService.getSongInformation()
-  return jsonify(songDetails)
+  return jsonify(songService.getSongInformation(
+    spotifyHeaders={ 'Authorization': 'Bearer ' + session.get('SPOTIFY_ACCESS_TOKEN', None) },
+    geniusHeaders={ 'Authorization': 'Bearer ' + session.get('GENIUS_ACCESS_TOKEN', None) }
+  ))
 
 if __name__ == "__main__":
   app.run(port=3000)
