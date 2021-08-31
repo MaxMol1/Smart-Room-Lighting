@@ -23,14 +23,13 @@ class SpotifyController:
     def trackCurrentSong(self, headers):
         try:
             res = requests.get(self.CURRENTLY_PLAYING_ENDPOINT, headers=headers)
-            resJSON = res.json()
+            res.raise_for_status()
+            return res.json()
+        except requests.exceptions.HTTPError as e:
+            raise
         except:
             raise Exception('FAILED to track current playing song')
 
-        if res.status_code == 401:
-            raise HTTPError('FAILED to authenticate with Spotify')
-        else:
-            return resJSON
 
     # Returns genre of current playing song
     def trackCurrentSongGenres(self, artistId, headers):
