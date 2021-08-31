@@ -4,14 +4,11 @@ import re
 class EmotionModel:
     # Returns top two emotions from song lyrics
     def getSongEmotion(self, lyrics):
-        if lyrics == '' or lyrics == 'This is an instrumental!':
+        if lyrics == '' or lyrics == 'this is an instrumental!':
             raise Exception('FAILED to receive lyrics')
-
-        # process lyrics
-        parsedLyrics = re.sub("[\(\[].*?[\)\]]", "", lyrics).lower()
         
         # invoke test2emotion function
-        emotionScore = te.get_emotion(parsedLyrics)
+        emotionScore = te.get_emotion(lyrics)
 
         # return two highest emotions
         firstEmotion = max(emotionScore, key = emotionScore.get)
