@@ -15,7 +15,17 @@ class SpotifyController:
     # Returns response from token endpoint
     def generateTokens(self, data):
         try:
-            return requests.post(self.TOKEN_ENDPOINT, data=data).json()
+            res = requests.post(self.TOKEN_ENDPOINT, data=data)
+            res.raise_for_status()
+            return res.json()
+        except requests.exceptions.HTTPError:
+            raise
+        except requests.exceptions.ConnectionError:
+            raise
+        except requests.exceptions.Timeout:
+            raise
+        except requests.exceptions.RequestException:
+            raise
         except:
             raise Exception('FAILED to generate Spotify access and refresh tokens')
 
@@ -25,15 +35,31 @@ class SpotifyController:
             res = requests.get(self.CURRENTLY_PLAYING_ENDPOINT, headers=headers)
             res.raise_for_status()
             return res.json()
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.HTTPError:
+            raise
+        except requests.exceptions.ConnectionError:
+            raise
+        except requests.exceptions.Timeout:
+            raise
+        except requests.exceptions.RequestException:
             raise
         except:
-            raise Exception('FAILED to track current playing song')
+            raise Exception('FAILED to retrieve currently playing song')
 
 
     # Returns genre of current playing song
     def trackCurrentSongGenres(self, artistId, headers):
         try:
-            return requests.get(self.ARTIST_ENDPOINT + str(artistId), headers=headers).json()
+            res = requests.get(self.ARTIST_ENDPOINT + str(artistId), headers=headers)
+            res.raise_for_status()
+            return res.json()
+        except requests.exceptions.HTTPError:
+            raise
+        except requests.exceptions.ConnectionError:
+            raise
+        except requests.exceptions.Timeout:
+            raise
+        except requests.exceptions.RequestException:
+            raise
         except:
-            raise Exception('FAILED to fetch artist genres for artistId: ' + str(artistId))
+            raise Exception('FAILED to retrieve genres for artistId: ' + str(artistId))
