@@ -1,48 +1,36 @@
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-from nltk.tokenize import RegexpTokenizer
-from nltk.corpus import stopwords
-import string
+import re
 
 class SentimentModel:
-    # Returns sentiment of song lyrics - Positive, Neutral, or Negative
+    # Returns sentiment of song lyrics - Positive, Negative, or Neutral
     def getSongSentiment(self, lyrics):
         sid = SentimentIntensityAnalyzer()
-        tokenizer = RegexpTokenizer(r'\w+')
-        # TODO: consider stopword removal
-        stop_words = stopwords.words('english') + list(string.punctuation) + ["ve", "nt", "s", "d", "ll", "re", "m", "verse", "chorus", "outro"]
 
+        # process lyrics
+        lines = re.sub("[\(\[].*?[\)\]]", "", lyrics).lower().split('\n')
+        lines = [line for line in lines if line]
+
+        # keep track of positive, negative, or neutral sentences
         positive = 0
         negative = 0
         neutral = 0
 
-        # split node app output into a list
-        lyrics = lyrics.split('\n')[1:-1]
-        lyrics_tokenized = []
-        
-        # tokenize and remove stopwords
-        for line in lyrics:
-            parsed_line = tokenizer.tokenize(line.lower())
-            parsed_line = [w for w in parsed_line if not w in stop_words and not w.isnumeric()]
-            parsed_line = " ".join(parsed_line)
-            lyrics_tokenized.append(parsed_line)
-
         # iterate through each line in lyrics
-        for line in lyrics_tokenized:
-            comp = sid.polarity_scores(line)
-            comp = comp['compound']
-            if comp >= 0.5:
+        for line in lines:
+            sentiment = sid.polarity_scores(line)
+            if sentiment['compound'] >= 0.5:
                 positive += 1
-            elif comp > -0.5 and comp < 0.5:
-                neutral += 1
-            else:
+            elif sentiment['compound'] <= -0.5:
                 negative += 1
+            else:
+                neutral += 1
 
         # if song has very little lyrics
         if not negative + positive + neutral:
             return 'Neutral'
 
-        percent_positive = (positive/float(negative + positive + neutral))*100
-        percent_negative = (negative/float(negative + positive + neutral))*100
+        percent_positive = (positive/float(positive + negative + neutral))*100
+        percent_negative = (negative/float(positive + negative + neutral))*100
 
         if abs(percent_positive - percent_negative) < 2:
             # neutral

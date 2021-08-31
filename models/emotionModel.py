@@ -8,10 +8,10 @@ class EmotionModel:
             raise Exception('FAILED to receive lyrics')
 
         # process lyrics
-        parsedLyrics = re.sub("[\(\[].*?[\)\]]", "", lyrics)
+        parsedLyrics = re.sub("[\(\[].*?[\)\]]", "", lyrics).lower()
         
         # invoke test2emotion function
-        emotionScore = te.get_emotion(parsedLyrics.lower())
+        emotionScore = te.get_emotion(parsedLyrics)
 
         # return two highest emotions
         firstEmotion = max(emotionScore, key = emotionScore.get)
