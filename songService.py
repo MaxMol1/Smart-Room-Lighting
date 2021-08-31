@@ -130,8 +130,8 @@ class SongService:
         geniusArtistId = 0
 
         # Search Genius using song name
-        print ('... Searching Genius for ' + songDetails['name'])
-        res = self.geniusController.getGeniusSearchRes(params={'q': songNameNorm}, headers=geniusHeaders)
+        print ('... Searching Genius for ' + songDetails['name'] + ' by ' + songDetails['artist'])
+        res = self.geniusController.getGeniusSearchRes(params={'q': songNameNorm + ' ' + artistNameNorm, 'per_page': 20}, headers=geniusHeaders)
         for hit in res['response']['hits']:
             songNorm = self.normalizeSong(hit['result']['title'])
             artistNorm = self.normalizeArtist(hit['result']['primary_artist']['name'])
