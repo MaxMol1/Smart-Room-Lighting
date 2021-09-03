@@ -10,9 +10,4 @@ class EmotionModel:
         # invoke test2emotion function
         emotionScore = te.get_emotion(lyrics)
 
-        # return two highest emotions
-        firstEmotion = max(emotionScore, key = emotionScore.get)
-        del emotionScore[firstEmotion]
-        secondEmotion = max(emotionScore, key = emotionScore.get)
-
-        return (firstEmotion, secondEmotion)
+        return sorted(emotionScore.items(), key=lambda x: x[1], reverse=True)

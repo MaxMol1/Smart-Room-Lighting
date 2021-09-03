@@ -8,6 +8,8 @@ var songData = new Vue({
         pop : '',
         genre : '',
         lyrics : '',
+        emotion: '',
+        sentiment: '',
         pColor : {
             'r' : 236,
             'g' : 240,
@@ -25,13 +27,15 @@ var songData = new Vue({
         }
     },
     methods: {
-        changeSong: function (name, artist, date, cover, pop, genre, lyrics, pColor, sColor) {
+        changeSong: function (name, artist, date, cover, pop, genre, lyrics, emotion, sentiment, pColor, sColor) {
             this.name = name + ' - ' + artist;
             this.date = date;
             this.cover = cover;
             this.pop = pop;
             this.genre = genre;
             this.lyrics = (lyrics === '') ? 'Lyrics not found, check logs ...' : lyrics;
+            this.emotion = emotion;
+            this.sentiment = sentiment;
             this.pColor = pColor;
             this.sColor = sColor;
         },
@@ -82,7 +86,7 @@ async function startTracking() {
         await $.ajax("/track").done(async function (data) {
             if (!jQuery.isEmptyObject(data) && !abort) {
                 console.log("... received song");
-                songData.changeSong(data.name, data.artist, data.date, data.cover, data.pop, data.genres[0], data.lyrics, data.colors[0], data.colors[1]);
+                songData.changeSong(data.name, data.artist, data.date, data.cover, data.pop, data.genres[0], data.lyrics, data.emotions[0], data.sentiment, data.colors[0], data.colors[1]);
                 showElements();
             }
         });

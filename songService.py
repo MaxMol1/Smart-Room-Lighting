@@ -213,7 +213,7 @@ class SongService:
         songDetails['emotions'] = self.emotionModel.getSongEmotion(parsedLyrics)
         songDetails['sentiment'] = self.sentimentModel.getSongSentiment(parsedLyricsList)
 
-        print ('... identified song as having ' + songDetails['emotions'][0] + ' emotion and ' + songDetails['sentiment'] + ' sentiment')
+        print ('... identified song as having ' + songDetails['emotions'][0][0] + ' emotion and ' + songDetails['sentiment'] + ' sentiment')
 
         customColorMapping = {
             ('Positive', 'Happy'): ({'r': 255, 'g': 255, 'b': 50}, {'r': 255, 'g': 153, 'b': 102}),
@@ -235,7 +235,7 @@ class SongService:
             ('Neutral', 'Fear'): ({'r': 255, 'g': 153, 'b': 102}, {'r': 255, 'g': 230, 'b': 238}),
         }
 
-        songDetails['colors'] = customColorMapping[(songDetails['sentiment'], songDetails['emotions'][0])]
+        songDetails['colors'] = customColorMapping[(songDetails['sentiment'], songDetails['emotions'][0][0])]
 
         return songDetails
 
